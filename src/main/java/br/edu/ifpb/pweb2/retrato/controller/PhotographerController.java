@@ -24,6 +24,6 @@ public class PhotographerController {
     @PostMapping("/register")
     public ResponseEntity<PhotographerDTO> register(@RequestBody PhotographerDTO photographerDTO) {
         PhotographerDTO savedPhotographer = service.register(photographerDTO);
-        return ResponseEntity.ok(savedPhotographer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPhotographer);
     }
 }
