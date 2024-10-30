@@ -3,6 +3,7 @@ package br.edu.ifpb.pweb2.retrato.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "tb_photographer")
 public class Photographer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

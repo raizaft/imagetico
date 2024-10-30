@@ -6,7 +6,9 @@ import java.io.Serializable;
 @Embeddable
 public class LikeId implements Serializable {
 
+    @Column(name = "photo_id")
     private Integer photoId;
+    @Column(name = "photographer_id")
     private Integer photographerId;
 
     public Integer getPhotoId() {

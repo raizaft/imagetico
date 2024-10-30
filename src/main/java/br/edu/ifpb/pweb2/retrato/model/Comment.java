@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "tb_comment")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

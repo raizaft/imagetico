@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 @Embeddable
 public class PhotoTagId implements Serializable {
+
     private Integer photoId;
     private Integer tagId;
 
