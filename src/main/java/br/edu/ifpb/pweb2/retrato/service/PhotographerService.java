@@ -13,21 +13,11 @@ public class PhotographerService {
     @Autowired
     private PhotographerRepository repository;
 
-    public PhotographerDTO register(PhotographerDTO photographerDTO) {
-        if (repository.existsByEmail(photographerDTO.email())) {
+    public Photographer register(Photographer photographer) {
+        if (repository.existsByEmail(photographer.getEmail())) {
             throw new IllegalArgumentException("Já existe uma conta com esse e-mail.");
         }
-
-        Photographer photographer = new Photographer();
-        photographer.setName(photographerDTO.name());
-        photographer.setEmail(photographerDTO.email());
-        photographer.setProfilePhoto(photographerDTO.profilePhoto());
-        photographer.setCity(photographerDTO.city());
-        photographer.setCountry(photographerDTO.country());
-
-        // Retornar um DTO ao invés do objeto Photographer
-        Photographer savedPhotographer = repository.save(photographer);
-        return new PhotographerDTO(savedPhotographer);
+       return repository.save(photographer);
     }
 
     public List<PhotographerDTO> list() {

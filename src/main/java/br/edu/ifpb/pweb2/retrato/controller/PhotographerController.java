@@ -1,13 +1,13 @@
 package br.edu.ifpb.pweb2.retrato.controller;
 
-import br.edu.ifpb.pweb2.retrato.dto.PhotographerDTO;
+
+import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/photographer")
@@ -16,23 +16,21 @@ public class PhotographerController {
     private PhotographerService service;
 
     @GetMapping("/form")
-    public String showForm(PhotographerDTO photographerDTO, Model model) {
-        model.addAttribute("photographer", photographerDTO);
-        return "photographer/form";
+    public ModelAndView getForm(ModelAndView modelAndView){
+        modelAndView.setViewName("photographer/form");
+        modelAndView.addObject("photographer", new Photographer());
+        return modelAndView;
     }
 
     @PostMapping("/register")
-    public String save(@Valid PhotographerDTO photographerDTO, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("photographer", photographerDTO);
-            return "photographer/form";
-        }
-        try {
-            PhotographerDTO savedPhotographer = service.register(photographerDTO);
-            return "redirect:/index";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "photographer/form";
-        }
+    public String registerPhotographer(@ModelAttribute Photographer photographer, RedirectAttributes redirectAttributes) {
+        service.register(photographer);
+        redirectAttributes.addFlashAttribute("mensagem", "Fotógrafo cadastrado com sucesso!");
+        return "redirect:/photographer/success";
+    }
+
+    @GetMapping("/success")
+    public String success() {
+        return "photographer/success";
     }
 }

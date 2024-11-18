@@ -20,6 +20,6 @@ public class Photographer {
 
     private String city;
     private String country;
-    private byte[] profilePhoto;
+    private String profilePhoto;
 
 }

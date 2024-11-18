@@ -9,11 +9,10 @@
 <div class="container mt-5">
     <h2>Cadastro de Fotógrafo</h2>
 
-    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
-        <p th:text="${errorMessage}"></p>
-    </div>
+    <div th:if="${mensagem}" th:text="${mensagem}" style="color: green;"></div>
 
-    <form action="#" th:action="@{/photographer/register}" th:object="${photographer}" method="post" enctype="multipart/form-data">
+
+    <form action="#" th:action="@{/photographer/register}" th:object="${photographer}" method="post" >
         <div class="mb-3">
             <label for="name" class="form-label">Nome</label>
             <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Digite seu nome" required>

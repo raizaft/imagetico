@@ -19,7 +19,7 @@ public record PhotographerDTO(
 
         String country,
 
-        byte[] profilePhoto
+        String profilePhoto
 ) {
 
     public PhotographerDTO() {
