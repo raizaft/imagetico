@@ -1,6 +1,6 @@
-# Retrato - Rede Social de Fotógrafos
+# Imagetico - Rede Social de Fotógrafos
 
-Retrato é uma aplicação web que permite aos fotógrafos registrar suas fotos em uma rede social. Os usuários podem curtir, comentar e seguir outros fotógrafos, interagindo com as fotos e promovendo o conteúdo através de hashtags. O administrador tem a responsabilidade de moderar os fotógrafos e garantir que todos sigam as regras da rede. Caso contrário, o fotógrafo poderá ser bloqueado temporariamente ou permanentemente.
+Imagetico é uma aplicação web que permite aos fotógrafos registrar suas fotos em uma rede social. Os usuários podem curtir, comentar e seguir outros fotógrafos, interagindo com as fotos e promovendo o conteúdo através de hashtags. O administrador tem a responsabilidade de moderar os fotógrafos e garantir que todos sigam as regras da rede. Caso contrário, o fotógrafo poderá ser bloqueado temporariamente ou permanentemente.
 
 ## Funcionalidades
 
