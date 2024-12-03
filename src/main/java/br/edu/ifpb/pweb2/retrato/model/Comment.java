@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Data
@@ -22,7 +24,27 @@ public class Comment {
     @ManyToOne
     private Photo photo;
 
+    @ElementCollection
+    private List<String> hashtags = new ArrayList<>();
+
     private LocalDateTime createdAt;
+
+//    public void editarComentario(String novoTexto) {
+//        this.commentText = novoTexto;
+//    }
+//
+//    public void excluirComentario() {
+//        // Lógica para exclusão (removido pelo Foto)
+//    }
+//
+//    public void adicionarHashtag(String hashtag) {
+//        hashtags.add(hashtag);
+//    }
+//
+//    public void removerHashtag(String hashtag) {
+//        hashtags.remove(hashtag);
+//    }
+
 
     public Comment() {}
 
