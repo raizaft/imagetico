@@ -12,18 +12,18 @@
     <div th:if="${mensagem}" th:text="${mensagem}" style="color: green;"></div>
 
 
-    <form action="#" th:action="@{/photographer/register}" th:object="${photographer}" method="post" >
+    <form action="#" th:action="@{/photographer/register}" th:object="${photographer}" method="post" enctype="multipart/form-data" >
         <div class="mb-3">
             <label for="name" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Digite seu nome" required>
+            <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Digite seu nome">
             <div th:if="${#fields.hasErrors('name')}" class="text-danger">
-                <p th:errors="*{name}">Nome inválido</p>
+                <p th:errors="*{name}"></p>
             </div>
         </div>
 
         <div class="mb-3">
             <label for="email" class="form-label">E-mail</label>
-            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Digite seu e-mail" required>
+            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Digite seu e-mail">
             <div th:if="${#fields.hasErrors('email')}" class="text-danger">
                 <p th:errors="*{email}">E-mail inválido</p>
             </div>
@@ -40,8 +40,8 @@
         </div>
 
         <div class="mb-3">
-            <label for="profilePhoto" class="form-label">Foto de Perfil</label>
-            <input type="file" class="form-control" id="profilePhoto" th:field="*{profilePhoto}">
+            <label for="profilePhotoFile" class="form-label">Foto de Perfil</label>
+            <input type="file" class="form-control" id="profilePhotoFile" name="profilePhotoFile" accept="image/*">
         </div>
 
         <button type="submit" class="btn btn-primary">Cadastrar</button>

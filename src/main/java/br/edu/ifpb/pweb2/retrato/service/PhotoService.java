@@ -1,7 +1,6 @@
 package br.edu.ifpb.pweb2.retrato.service;
 
 import br.edu.ifpb.pweb2.retrato.dto.PhotoDTO;
-import br.edu.ifpb.pweb2.retrato.dto.PhotographerDTO;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.repository.PhotoRepository;

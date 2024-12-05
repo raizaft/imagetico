@@ -1,12 +1,10 @@
 package br.edu.ifpb.pweb2.retrato.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -26,5 +24,7 @@ public abstract class User {
 
     private String city;
     private String country;
-    private String profilePhoto;
+    @Transient
+    private MultipartFile profilePhotoFile;
+    private String profilePhotoPath;
 }

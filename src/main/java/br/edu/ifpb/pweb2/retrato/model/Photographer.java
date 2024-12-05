@@ -27,6 +27,8 @@ public class Photographer extends User {
     @OneToMany(mappedBy = "photographer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
 
+
+
 //    public void publicarFoto(Photo foto) {
 //        foto.setPhotographer(this);
 //        photos.add(foto);
