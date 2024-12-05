@@ -1,0 +1,19 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 10px 80px 10px 80px;
+    background-color: black;
+    color: white;
+}
+.menu {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+p {
+    margin: 0;
+}
+a {
+    color: white;
+    text-decoration: none;
+}

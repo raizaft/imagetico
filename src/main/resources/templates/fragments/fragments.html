@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragmentos</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}"/>
+</head>
+<body>
+  <div th:fragment="header" class="navbar">
+      <p>IMAGÉTICO</p>
+      <div class="menu">
+          <p>Login</p>
+          <a th:href="@{/photographer/form}">Criar Conta</a>
+      </div>
+  </div>
+
+</body>
+</html>
