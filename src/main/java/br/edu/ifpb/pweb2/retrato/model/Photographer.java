@@ -28,20 +28,4 @@ public class Photographer extends User {
     private List<Photo> photos = new ArrayList<>();
 
 
-
-//    public void publicarFoto(Photo foto) {
-//        foto.setPhotographer(this);
-//        photos.add(foto);
-//    }
-//
-//    public void seguir(Photographer photographer) {
-//        seguindo.add(photographer);
-//        photographer.getSeguidores().add(this);
-//    }
-//
-//    public void deixarDeSeguir(Photographer photographer) {
-//        seguindo.remove(photographer);
-//        photographer.getSeguidores().remove(this);
-//    }
-
 }

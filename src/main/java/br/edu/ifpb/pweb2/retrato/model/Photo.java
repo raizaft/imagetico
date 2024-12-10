@@ -30,17 +30,5 @@ public class Photo {
     @ManyToOne
     private Photographer photographer;
 
-//    public void adicionarCurtida() {
-//        this.curtidas++;
-//    }
-//
-//    public void removerCurtida() {
-//        if (this.curtidas > 0) this.curtidas--;
-//    }
-//
-//    public void adicionarComentario(Comment comentario) {
-//        comentario.setPhoto(this);
-//        comentarios.add(comentario);
-//    }
 
 }

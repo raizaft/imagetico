@@ -19,4 +19,5 @@ public class Administrator extends User {
     public void gerarRelatorioPDF(Photo foto) {
 
     }
+
 }

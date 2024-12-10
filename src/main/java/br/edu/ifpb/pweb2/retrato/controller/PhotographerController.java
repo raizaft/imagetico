@@ -22,9 +22,15 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/photographer")
+@SessionAttributes("photographerLogado")
 public class PhotographerController {
     @Autowired
     private PhotographerService service;
+
+    @ModelAttribute("photographerLogado")
+    public Photographer getLoggedInPhotographer() {
+        return new Photographer();
+    }
 
     @GetMapping("/form")
     public ModelAndView getForm(ModelAndView modelAndView){
@@ -59,5 +65,35 @@ public class PhotographerController {
         List<Photographer> photographers = service.list();
         model.addAttribute("photographers", photographers);
         return "photographer/success";
+    }
+
+    @PostMapping("/login")
+    public String login(@ModelAttribute @Valid Photographer photographer,
+                        BindingResult result,
+                        RedirectAttributes redirectAttributes, Model model) {
+        if (result.hasErrors()) {
+            return "photographer/login";
+        }
+        Photographer photographerLogado = service.login(photographer.getName(), photographer.getEmail());
+        if(photographerLogado != null) {
+            model.addAttribute("photographerLogado", photographerLogado);
+            redirectAttributes.addFlashAttribute("mensagem", "Usuario logado com sucesso!");
+            return "redirect:/photographer/dashboard";
+        } else {
+            redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
+            return "redirect:/photographer/login";
+        }
+
+    }
+    @GetMapping("/login")
+    public String loginForm(Model model) {
+        model.addAttribute("photographer", new Photographer());
+        return "photographer/login";
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard(@ModelAttribute("loggedInPhotographer") Photographer photographer, Model model) {
+        model.addAttribute("photographer", photographer);
+        return "photographer/dashboard";
     }
 }

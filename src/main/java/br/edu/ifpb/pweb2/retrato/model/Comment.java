@@ -1,7 +1,9 @@
 package br.edu.ifpb.pweb2.retrato.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "tb_comment")
 public class Comment {
     @Id
@@ -29,24 +33,6 @@ public class Comment {
 
     private LocalDateTime createdAt;
 
-//    public void editarComentario(String novoTexto) {
-//        this.commentText = novoTexto;
-//    }
-//
-//    public void excluirComentario() {
-//        // Lógica para exclusão (removido pelo Foto)
-//    }
-//
-//    public void adicionarHashtag(String hashtag) {
-//        hashtags.add(hashtag);
-//    }
-//
-//    public void removerHashtag(String hashtag) {
-//        hashtags.remove(hashtag);
-//    }
-
-
-    public Comment() {}
 
     public Comment(String commentText, Photographer photographer, Photo photo) {
         this.commentText = commentText;
