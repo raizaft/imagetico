@@ -13,6 +13,8 @@ import java.util.List;
 @Table(name = "tb_photographer")
 public class Photographer extends User {
 
+    private boolean suspended = false;
+
     @ManyToMany
     @JoinTable(
             name = "seguidores",

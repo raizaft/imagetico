@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador - Imagetico</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <header class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Administrador <span th:text="${admLogado.name}"></span></h1>
+        <a href="/logout" class="btn btn-danger">Sair</a>
+    </header>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Lista de Fotógrafos</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Data de Cadastro</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="photographer : ${photographers}">
+                    <td th:text="${photographer.id}"></td>
+                    <td th:text="${photographer.name}"></td>
+                    <td th:text="${photographer.email}"></td>
+                    <td th:text="${photographer.dataCriacao}"></td>
+                    <td>
+                        <form th:action="@{/administrator/suspend}" method="post" class="d-inline">
+                            <input type="hidden" th:value="${photographer.id}" name="photographerId">
+                            <button type="submit" class="btn btn-warning btn-sm">Suspender</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "tb_administrator")
 public class Administrator extends User {
 
+    private String password;
+
     public void suspenderUsuario(User usuario, String motivo) {
 
     }

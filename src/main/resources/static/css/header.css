@@ -10,6 +10,14 @@
     flex-direction: row;
     gap: 15px;
 }
+.navbar .menu a {
+    color: #fff;
+    font-size: 18px;
+    margin-left: 15px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
 p {
     margin: 0;
 }

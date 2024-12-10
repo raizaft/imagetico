@@ -1,0 +1,32 @@
+body {
+    background-color: #f8f9fa;
+}
+.dashboard-header {
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px 0;
+}
+.dashboard-header h1 {
+    margin: 0;
+}
+.profile-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fff;
+}
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+.logout-btn {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+}
+.logout-btn:hover {
+    background-color: #c82333;
+}

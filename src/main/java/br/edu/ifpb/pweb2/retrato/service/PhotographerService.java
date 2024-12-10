@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class PhotographerService {
@@ -33,5 +32,12 @@ public class PhotographerService {
 
     public List<Photographer> list() {
         return repository.findAll();
+    }
+
+    public void suspendPhotographer(Integer photographerId) {
+        Photographer photographer = repository.findById(photographerId)
+                .orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado"));
+        photographer.setSuspended(true);
+        repository.save(photographer);
     }
 }
