@@ -11,6 +11,7 @@
     <header class="d-flex justify-content-between align-items-center mb-4">
         <h1>Administrador <span th:text="${admLogado.name}"></span></h1>
         <a href="/logout" class="btn btn-danger">Sair</a>
+        <!-- botão de sair não funciona ainda (ajeitar)-->
     </header>
 
     <div class="card">
@@ -35,9 +36,16 @@
                     <td th:text="${photographer.email}"></td>
                     <td th:text="${photographer.dataCriacao}"></td>
                     <td>
-                        <form th:action="@{/administrator/suspend}" method="post" class="d-inline">
+                        <form th:action="@{/administrator/suspend}" method="post" class="d-inline"
+                              th:if="${!photographer.suspended}">
                             <input type="hidden" th:value="${photographer.id}" name="photographerId">
                             <button type="submit" class="btn btn-warning btn-sm">Suspender</button>
+                        </form>
+
+                        <form th:action="@{/administrator/activate}" method="post" class="d-inline"
+                              th:if="${photographer.suspended}">
+                            <input type="hidden" th:value="${photographer.id}" name="photographerId">
+                            <button type="submit" class="btn btn-success btn-sm">Ativar</button>
                         </form>
                     </td>
                 </tr>

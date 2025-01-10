@@ -38,7 +38,7 @@ public class AdministratorController {
             return "administrator/loginAdm";
         }
         Administrator admLogado = service.login(adm.getEmail(), adm.getPassword());
-        if(admLogado != null) {
+        if (admLogado != null) {
             model.addAttribute("admLogado", admLogado);
             redirectAttributes.addFlashAttribute("mensagem", "Usuario logado com sucesso!");
             return "redirect:/administrator/dashboardAdm";
@@ -70,6 +70,12 @@ public class AdministratorController {
     @PostMapping("/suspend")
     public String suspendPhotographer(@RequestParam Integer photographerId) {
         photographerService.suspendPhotographer(photographerId);
+        return "redirect:/administrator/dashboardAdm";
+    }
+
+    @PostMapping("/activate")
+    public String activatePhotographer(@RequestParam Integer photographerId) {
+        photographerService.activatePhotographer(photographerId);
         return "redirect:/administrator/dashboardAdm";
     }
 }

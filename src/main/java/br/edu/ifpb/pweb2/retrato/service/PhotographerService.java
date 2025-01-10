@@ -40,4 +40,11 @@ public class PhotographerService {
         photographer.setSuspended(true);
         repository.save(photographer);
     }
+
+    public void activatePhotographer(Integer photographerId) {
+        Photographer photographer = repository.findById(photographerId)
+                .orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado"));
+        photographer.setSuspended(false);
+        repository.save(photographer);
+    }
 }
