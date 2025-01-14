@@ -46,3 +46,12 @@ h3 {
     border-radius: 4px;
     transition: background-color 0.3s ease;
 }
+.logotitle {
+    height: 18px;
+}
+.containerimg {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 0;
+}

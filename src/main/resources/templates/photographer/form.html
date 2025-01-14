@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Cadastro de fotografos</title>
@@ -15,6 +15,9 @@
         <p class="subtitle">E compartilhe sua visão com o mundo.</p>
     </div>
     <div class="container">
+        <div class="containerimg">
+            <img class="logotitle" th:src="@{/imgs/logopreta.png}" alt="logo">
+        </div>
         <div th:if="${mensagem}" th:text="${mensagem}" style="color: green;"></div>
         <form action="#" th:action="@{/photographer/register}" th:object="${photographer}" method="post" enctype="multipart/form-data" >
             <div class="mb-3">
