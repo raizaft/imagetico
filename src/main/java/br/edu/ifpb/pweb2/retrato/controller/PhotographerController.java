@@ -103,4 +103,14 @@ public class PhotographerController {
         model.addAttribute("photographer", photographer);
         return "photographer/dashboard";
     }
+
+    @GetMapping("/follow")
+    public void seguir(Photographer photographer1, Photographer photographer2) {
+        service.follow(photographer1, photographer2);
+    }
+
+    @GetMapping("/{id}")
+    public List<Photographer> followersList(@PathVariable Integer id) {
+        return service.getAllFollowers(id);
+    }
 }

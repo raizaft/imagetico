@@ -1,5 +1,7 @@
 package br.edu.ifpb.pweb2.retrato.controller;
 
+import br.edu.ifpb.pweb2.retrato.dto.CommentDTO;
+import br.edu.ifpb.pweb2.retrato.dto.LikeDTO;
 import br.edu.ifpb.pweb2.retrato.dto.PhotoDTO;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +22,17 @@ public class PhotoController {
     public ResponseEntity<PhotoDTO> uploadPhoto(@RequestBody PhotoDTO photoDTO) {
         PhotoDTO savedPhoto = service.publish(photoDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPhoto);
+    }
+
+    @PostMapping("/addComment")
+    public String addComment(@RequestBody CommentDTO comment) {
+        service.addComment(comment.photographerId(), comment.photoId(), comment.commentText());
+        return "Comment added";
+    }
+
+    @PostMapping("/likePhoto")
+    public String likePhoto(@RequestBody LikeDTO like) {
+        service.likePhoto(like.photographerId(), like.photoId());
+        return "Like added";
     }
 }

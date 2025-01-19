@@ -4,17 +4,19 @@ import br.edu.ifpb.pweb2.retrato.model.Photo;
 
 public record PhotoDTO(
         Integer id,
-        byte[] imageData,
-        String imageUrl,
-        Integer photographerId
+//        byte[] imageData,
+//        String imageUrl,
+        Integer photographerId,
+        String photoDescription
 ) {
 
     public PhotoDTO(Photo photo) {
         this(
             photo.getId(),
-            photo.getImageData(),
-            photo.getImageUrl(),
-            photo.getPhotographer().getId()
+//            photo.getImageData(),
+//            photo.getImageUrl(),
+            photo.getPhotographer().getId(),
+            photo.getDescription()
         );
     }
 }

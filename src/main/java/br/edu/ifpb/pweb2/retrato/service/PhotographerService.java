@@ -47,4 +47,16 @@ public class PhotographerService {
         photographer.setSuspended(false);
         repository.save(photographer);
     }
+
+    public void follow(Photographer photographerFollowed, Photographer photographerFollower) {
+        photographerFollowed.getSeguidores().add(photographerFollower);
+        photographerFollower.getSeguindo().add(photographerFollowed);
+        repository.save(photographerFollowed);
+        repository.save(photographerFollower);
+    }
+
+    public List<Photographer> getAllFollowers(Integer id) {
+        Photographer photographer = repository.findById(id).orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado"));
+        return photographer.getSeguidores();
+    }
 }

@@ -1,34 +1,40 @@
 package br.edu.ifpb.pweb2.retrato.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "tb_photo")
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String description;
-    private byte[] imageData;
-    private String imageUrl;
-    private int curtidas;
+//    private byte[] imageData;
+//    private String imageUrl;
 
-    @ElementCollection
-    private List<String> hashtags = new ArrayList<>();
-
-    private LocalDate dataPublicacao = LocalDate.now();
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comentarios = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;
 
     @ManyToOne
     private Photographer photographer;
 
-
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.likes = new ArrayList<>();
+    }
 }
