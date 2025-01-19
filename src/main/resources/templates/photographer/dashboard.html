@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Perfil - Fotógrafo</title>
+    <title>Imagetico</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
     <link rel="stylesheet" th:href="@{/css/header.css}"/>
@@ -11,15 +11,60 @@
 <body>
 <div th:insert="fragments/header :: headerD"></div>
 
-<div class="container mt-5">
-    <h1>Bem-vindo, <span th:text="${photographerLogado.name}"></span>!</h1>
+<div class="container-fluid mt-5">
+    <div class="row mt-4">
+        <div class="col-md-9">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4>Publicar Foto</h4>
+                    <form th:action="@{/photographer/publish}" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Escolher Foto</label>
+                            <input type="file" name="photo" id="photo" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <textarea name="description" class="form-control" rows="2" placeholder="Descrição"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Publicar</button>
+                    </form>
+                </div>
+            </div>
 
-    <div class="mt-4">
-        <a th:href="@{/photographer/works}" class="btn btn-primary">Ver Meus Trabalhos</a>
-        <a th:href="@{/photographer/profile}" class="btn btn-secondary">Editar Perfil</a>
+            <div class="row">
+                <h4>Fotos Publicadas</h4>
+                <div class="col-md-6 mb-4" th:each="photo : ${publishedPhotos}">
+                    <div class="card">
+                        <img th:src="${photo.url}" class="card-img-top" alt="Foto publicada">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${photo.title}">Título da Foto</h5>
+                            <p class="card-text" th:text="${photo.description}">Descrição da Foto</p>
+                            <div class="d-flex justify-content-between">
+
+                                <button class="btn btn-sm btn-outline-primary" th:onclick="'curtirFoto(' + ${photo.id} + ')'">
+                                    <i class="bi bi-hand-thumbs-up"></i> Curtir
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" th:onclick="'comentarFoto(' + ${photo.id} + ')'">
+                                    <i class="bi bi-chat-dots"></i> Comentar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 border-start">
+            <h4>Opções para seguir</h4>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center" th:each="photographer : ${photographers}">
+                    <span th:text="${photographer.name}">Fotógrafo</span>
+                    <a th:href="@{/photographer/{id}/view(id=${photographer.id})}" class="btn btn-outline-info">Ver Perfil</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

@@ -9,7 +9,9 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -20,25 +22,18 @@ import java.util.List;
 public class Photographer extends User {
 
     private boolean suspended = false;
-
-    @ManyToMany
-    @JoinTable(
-            name = "seguidores",
-            joinColumns = @JoinColumn(name = "fotografo_id"),
-            inverseJoinColumns = @JoinColumn(name = "seguidor_id")
-    )
-
-    @ToString.Exclude
-    @JsonIgnore
-    private List<Photographer> seguidores = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "seguidores")
-    @ToString.Exclude
-    @JsonIgnore
-    private List<Photographer> seguindo = new ArrayList<>();
+    private boolean followAllowed = true;
 
     @OneToMany(mappedBy = "photographer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "photographer_following",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_id")
+    )
+    private List<Photographer> following = new ArrayList<>();
 
     public Photographer() {
         super();

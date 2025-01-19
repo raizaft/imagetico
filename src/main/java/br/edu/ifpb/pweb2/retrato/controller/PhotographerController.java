@@ -80,7 +80,7 @@ public class PhotographerController {
             redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
             return "redirect:/photographer/login";
         }
-        //melhorar o local da mensagem no login/html
+
         if (photographerLogado.isSuspended()) {
             redirectAttributes.addFlashAttribute("mensagem", "Sua conta está suspensa. Entre em contato com o suporte.");
             return "redirect:/photographer/login";
@@ -99,18 +99,44 @@ public class PhotographerController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(@ModelAttribute("loggedInPhotographer") Photographer photographer, Model model) {
-        model.addAttribute("photographer", photographer);
+    public String dashboard(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
+        List<Photographer> photographers = service.list();
+        model.addAttribute("photographers", photographers);
+        model.addAttribute("photographerLogado", service.findById(photographer.getId()));
         return "photographer/dashboard";
     }
 
-    @GetMapping("/follow")
-    public void seguir(Photographer photographer1, Photographer photographer2) {
-        service.follow(photographer1, photographer2);
+    @GetMapping("/profile")
+    public String profile(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
+        model.addAttribute("photographerLogado", photographer);
+        return "photographer/profile";
     }
 
-    @GetMapping("/{id}")
-    public List<Photographer> followersList(@PathVariable Integer id) {
-        return service.getAllFollowers(id);
+    @PostMapping("/follow/{followedId}")
+    public String followPhotographer(@PathVariable("followedId") Integer followedId,
+                                     @ModelAttribute("photographerLogado") Photographer photographerLogado,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            Integer followerId = photographerLogado.getId();
+            service.followPhotographer(followerId, followedId);
+            redirectAttributes.addFlashAttribute("mensagem", "Você começou a seguir o fotógrafo!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao tentar seguir o fotógrafo: " + e.getMessage());
+        }
+        return "redirect:/photographer/profile";
+    }
+
+    @GetMapping("/following")
+    public String listFollowing(@ModelAttribute("photographerLogado") Photographer photographerLogado, Model model) {
+        List<Photographer> following = photographerLogado.getFollowing();
+        model.addAttribute("following", following);
+        return "photographer/profile";
+    }
+
+    @GetMapping("/{id}/view")
+    public String viewPhotographer(@PathVariable Integer id, Model model) {
+        Photographer photographer = service.findById(id);
+        model.addAttribute("photographer", photographer);
+        return "photographer/view";
     }
 }

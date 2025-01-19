@@ -2,6 +2,7 @@ package br.edu.ifpb.pweb2.retrato.service;
 
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.repository.PhotographerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,15 +49,19 @@ public class PhotographerService {
         repository.save(photographer);
     }
 
-    public void follow(Photographer photographerFollowed, Photographer photographerFollower) {
-        photographerFollowed.getSeguidores().add(photographerFollower);
-        photographerFollower.getSeguindo().add(photographerFollowed);
-        repository.save(photographerFollowed);
-        repository.save(photographerFollower);
+    public Photographer findById(Integer id) {
+        return repository.findById(id).orElse(null);
     }
 
-    public List<Photographer> getAllFollowers(Integer id) {
-        Photographer photographer = repository.findById(id).orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado"));
-        return photographer.getSeguidores();
+    public void followPhotographer(Integer followerId, Integer followedId) {
+        if (followerId.equals(followedId)) {
+            throw new IllegalArgumentException("Um fotógrafo não pode seguir a si mesmo.");
+        }
+
+        Photographer follower = findById(followerId);
+        Photographer followed = findById(followedId);
+        follower.getFollowing().add(followed);
+
+        repository.save(followed);
     }
 }
