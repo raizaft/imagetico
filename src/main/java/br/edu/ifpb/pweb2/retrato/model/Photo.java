@@ -2,6 +2,7 @@ package br.edu.ifpb.pweb2.retrato.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,8 +19,9 @@ public class Photo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String description;
-//    private byte[] imageData;
-//    private String imageUrl;
+    @Transient
+    private MultipartFile photoFile;
+    private String photoPath;
 
     private LocalDateTime createdAt;
 

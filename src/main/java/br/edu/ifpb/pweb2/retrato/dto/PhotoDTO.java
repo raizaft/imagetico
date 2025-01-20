@@ -1,11 +1,12 @@
 package br.edu.ifpb.pweb2.retrato.dto;
 
 import br.edu.ifpb.pweb2.retrato.model.Photo;
+import org.springframework.web.multipart.MultipartFile;
 
 public record PhotoDTO(
         Integer id,
-//        byte[] imageData,
-//        String imageUrl,
+        MultipartFile photoFile,
+        String photoPath,
         Integer photographerId,
         String photoDescription
 ) {
@@ -13,8 +14,8 @@ public record PhotoDTO(
     public PhotoDTO(Photo photo) {
         this(
             photo.getId(),
-//            photo.getImageData(),
-//            photo.getImageUrl(),
+            photo.getPhotoFile(),
+            photo.getPhotoPath(),
             photo.getPhotographer().getId(),
             photo.getDescription()
         );

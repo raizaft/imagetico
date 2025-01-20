@@ -29,18 +29,15 @@ public class PhotoService {
     @Autowired
     private LikeRepository likeRepository;
 
-    public PhotoDTO publish(PhotoDTO photoDTO) {
-        Photographer photographer = photographerRepository.findById(photoDTO.photographerId())
+    public Photo publish(Photo photo) {
+        Photographer photographer = photographerRepository.findById(photo.getPhotographer().getId())
                 .orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado."));
 
-        Photo photo = Photo.builder()
-                .description(photoDTO.photoDescription())
-                .comments(new ArrayList<>())
-                .likes(new ArrayList<>())
-                .photographer(photographer)
-                .build();
+        photo.setPhotographer(photographer);
+        photo.setComments(new ArrayList<>());
+        photo.setLikes(new ArrayList<>());
 
-        return new PhotoDTO(photoRepository.save(photo));
+        return photoRepository.save(photo);
     }
 
     public void addComment(Integer photographerId, Integer photoId, String comment) {

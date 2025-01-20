@@ -2,6 +2,14 @@
     font-family: Lato, sans-serif;
 }
 
+.box-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    background-color: #ffc5c8;
+}
+
 .box-form {
     height: calc(100vh - 44px);
     display: flex;

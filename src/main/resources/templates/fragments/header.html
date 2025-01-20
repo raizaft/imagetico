@@ -16,10 +16,12 @@
         <a th:href="@{/photographer/profile}" title="Perfil">
             <i class="bi bi-person"></i>
         </a>
-        <a th:href="@{/photographer/login}" title="Sair">
+
+        <a href="#" onclick="document.getElementById('logout-form').submit();">
             <i class="bi bi-box-arrow-right"></i>
         </a>
-    </div>
+        <form id="logout-form" action="/photographer/logout" method="post" style="display:none;"></form>
+        </div>
 </div>
 </body>
 </html>
