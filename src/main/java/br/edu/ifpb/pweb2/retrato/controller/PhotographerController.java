@@ -3,6 +3,7 @@ package br.edu.ifpb.pweb2.retrato.controller;
 
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,8 +29,8 @@ public class PhotographerController {
     private PhotographerService service;
 
     @ModelAttribute("photographerLogado")
-    public Photographer getLoggedInPhotographer() {
-        return new Photographer();
+    public Photographer getLoggedInPhotographer(HttpSession session) {
+        return (Photographer) session.getAttribute("photographerLogado");
     }
 
     @GetMapping("/form")
@@ -70,12 +71,13 @@ public class PhotographerController {
     @PostMapping("/login")
     public String login(@ModelAttribute @Valid Photographer photographer,
                         BindingResult result,
-                        RedirectAttributes redirectAttributes, Model model) {
+                        RedirectAttributes redirectAttributes,  HttpSession session) {
         if (result.hasErrors()) {
             return "photographer/login";
         }
 
         Photographer photographerLogado = service.login(photographer.getName(), photographer.getEmail());
+
         if (photographerLogado == null) {
             redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
             return "redirect:/photographer/login";
@@ -86,10 +88,16 @@ public class PhotographerController {
             return "redirect:/photographer/login";
         }
 
-        model.addAttribute("photographerLogado", photographerLogado);
+        session.setAttribute("photographerLogado", photographerLogado);
         redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
         return "redirect:/photographer/dashboard";
+    }
 
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("photographerLogado");
+        session.invalidate();
+        return "redirect:/photographer/login";
     }
 
     @GetMapping("/login")
@@ -100,6 +108,10 @@ public class PhotographerController {
 
     @GetMapping("/dashboard")
     public String dashboard(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
+        if (photographer == null || photographer.getId() == null) {
+            return "redirect:/photographer/login";
+        }
+
         List<Photographer> photographers = service.list();
         model.addAttribute("photographers", photographers);
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
