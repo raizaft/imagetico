@@ -171,6 +171,10 @@ public class PhotographerController {
     @GetMapping("/{id}/view")
     public String viewPhotographer(@PathVariable Integer id, Model model) {
         Photographer photographer = service.findById(id);
+        List<Photo> photos = photographer.getPhotos();
+        Collections.reverse(photos);
+
+        model.addAttribute("photos", photos);
         model.addAttribute("photographer", photographer);
         return "photographer/view";
     }

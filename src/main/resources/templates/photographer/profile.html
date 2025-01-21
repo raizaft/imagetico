@@ -25,12 +25,11 @@
       </div>
       <div class="buttons">
         <button class="btn btn-outline-primary"><i class="bi bi-eye" style="margin-right: 8px"></i>Seguindo</button>
-        <button class="btn btn-primary"><i class="bi bi-person-add" style="margin-right: 8px"></i>Seguir</button>
       </div>
     </div>
     <div class="container-cards">
       <div class="card" th:each="photo : ${photos}">
-        <div th:insert="~{fragments/photocard::photocard(photo=${photo})}"></div>
+        <div th:insert="~{fragments/photocard-profile::photocard-profile(photo=${photo})}"></div>
       </div>
     </div>
 

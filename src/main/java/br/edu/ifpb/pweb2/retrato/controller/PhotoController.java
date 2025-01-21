@@ -3,6 +3,7 @@ package br.edu.ifpb.pweb2.retrato.controller;
 import br.edu.ifpb.pweb2.retrato.dto.CommentDTO;
 import br.edu.ifpb.pweb2.retrato.dto.LikeDTO;
 import br.edu.ifpb.pweb2.retrato.dto.PhotoDTO;
+import br.edu.ifpb.pweb2.retrato.model.Comment;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
@@ -92,8 +93,11 @@ public class PhotoController {
 //    }
 
     @PostMapping("/addComment")
-    public String addComment(@RequestBody CommentDTO comment) {
-        service.addComment(comment.photographerId(), comment.photoId(), comment.commentText());
+    public String addComment(@RequestParam("commentText") String commentText,
+                             @RequestParam("photographerId") Integer photographerId,
+                             @RequestParam("photoId") Integer photoId) {
+
+        service.addComment(photographerId, photoId, commentText);
         return "Comment added";
     }
 

@@ -24,6 +24,21 @@
 <!--                    <i class="bi" th:classappend="${photo.isLikedByUser(photographer) ? 'bi-heart-fill' : 'bi-heart'}"></i>-->
 <!--                </button>-->
 <!--            </form>-->
+            <div class="comment-button">
+                <form th:action="@{/photo/addComment}" method="POST" style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
+                    <textarea class="form-control" id="description" name="commentText" placeholder="Escreva um comentário..." style="height: 60px; resize: none;"></textarea>
+
+                    <input type="hidden" name="photographerId" th:value="${photo.photographer.getId()}" />
+                    <input type="hidden" name="photoId" th:value="${photo.getId()}" />
+
+                    <button type="submit" class="btn btn-light">
+                        <i class="bi bi-plus-circle-fill" style="font-size: 24px"></i>
+                    </button>
+                </form>
+                <div class="comment" th:each="comment : ${photo.getComments()}">
+                    <div th:insert="~{fragments/comments::comments(comment=${comment})}"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
