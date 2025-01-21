@@ -82,23 +82,13 @@ public class PhotoController {
         return "redirect:/photographer/dashboard";
     }
 
-//    @GetMapping("/{id}")
-//    public String viewPhoto(@PathVariable("id") Integer id, Model model) {
-//        Photo photo = service.findById(id);
-//        if (photo == null) {
-//            return "redirect:/photographer/dashboard";
-//        }
-//        model.addAttribute("photo", photo);
-//        return "photo/post";
-//    }
-
     @PostMapping("/addComment")
     public String addComment(@RequestParam("commentText") String commentText,
                              @RequestParam("photographerId") Integer photographerId,
                              @RequestParam("photoId") Integer photoId) {
 
         service.addComment(photographerId, photoId, commentText);
-        return "Comment added";
+        return "redirect:/photographer/dashboard";
     }
 
     @PostMapping("/likePhoto")
