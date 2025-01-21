@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/photocard.css}"/>
 </head>
 <body>
-<div th:fragment="photocard (photo)">
+<div th:fragment="photocard (photo, photographerLogado)">
     <div class="photocard">
         <p style="padding: 16px; font-size: 12px; margin: 0">
             Postado por <strong th:text="${photo.photographer.name}"></strong> em <span th:text="${photo.createdAt}"></span>
@@ -28,16 +28,23 @@
                 <form th:action="@{/photo/addComment}" method="POST" style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
                     <textarea class="form-control" id="description" name="commentText" placeholder="Escreva um comentário..." style="height: 60px; resize: none;"></textarea>
 
-                    <input type="hidden" name="photographerId" th:value="${photo.photographer.getId()}" />
+                    <input type="hidden" name="photographerId" th:value="${photographerLogado.getId()}" />
                     <input type="hidden" name="photoId" th:value="${photo.getId()}" />
 
                     <button type="submit" class="btn btn-light">
                         <i class="bi bi-plus-circle-fill" style="font-size: 24px"></i>
                     </button>
                 </form>
-                <div class="comment" th:each="comment : ${photo.getComments()}">
-                    <div th:insert="~{fragments/comments::comments(comment=${comment})}"></div>
+            </div>
+            <div class="comment-box" th:each="comment : ${photo.comments}" style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 16px">
+                <div class="comment-photo" style="display: flex; flex-direction: row; align-items: flex-start; gap:8px">
+                    <img class="profile-photo-comment" th:src="${comment.photographer.getProfilePhotoPath()}" alt="Foto" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover">
+                    <div class="comment-info" style="display: flex; flex-direction: column">
+                        <p class="comment-name" th:text="${comment.photographer.getName()}" style="margin: 0; font-weight: bold"></p>
+                        <p class="comment-text" th:text="${comment.commentText}" style="margin: 0"></p>
+                    </div>
                 </div>
+                <p class="comment-date" th:text="${comment.createdAt}" style="font-size: 12px"></p>
             </div>
         </div>
     </div>

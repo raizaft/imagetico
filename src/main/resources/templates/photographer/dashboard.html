@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="card" th:each="photo : ${followingPhotos}">
-                <div th:insert="~{fragments/photocard::photocard(photo=${photo})}"></div>
+                <div th:insert="~{fragments/photocard::photocard(photo=${photo}, photographerLogado=${photographerLogado})}"></div>
             </div>
         </div>
         <div class="col-md-3 border-start">

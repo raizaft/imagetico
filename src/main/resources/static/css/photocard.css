@@ -6,3 +6,11 @@
     background:none;
     border: none;
 }
+
+.comment-name {
+    font-weight: bold;
+}
+
+.comment-date {
+    font-size: 10px;
+}
