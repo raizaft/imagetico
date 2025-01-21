@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,9 +27,11 @@ public class Comment {
     private String commentText;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Photographer photographer;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Photo photo;
 
     private LocalDateTime createdAt;

@@ -13,9 +13,9 @@
     <div class="container">
         <p class="uploadtitle">Nova publicação</p>
         <div th:if="${mensagem}" th:text="${mensagem}" style="color: green;"></div>
-        <form action="#" th:action="@{/photos/upload}" th:object="${photo}" method="post" enctype="multipart/form-data" >
+        <form action="#" th:action="@{/photo/upload}" th:object="${photo}" method="post" enctype="multipart/form-data" >
             <div class="mb-3">
-                <input type="file" class="form-control" id="profilePhotoFile" name="profilePhotoFile" accept="image/*">
+                <input type="file" class="form-control" id="photoFile" th:field="*{photoFile}" accept="image/*">
             </div>
             <div class="mb-3">
                 <textarea class="form-control" id="description" th:field="*{description}" placeholder="Escreva a legenda..."></textarea>

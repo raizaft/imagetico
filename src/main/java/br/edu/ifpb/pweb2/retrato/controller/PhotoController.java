@@ -3,15 +3,18 @@ package br.edu.ifpb.pweb2.retrato.controller;
 import br.edu.ifpb.pweb2.retrato.dto.CommentDTO;
 import br.edu.ifpb.pweb2.retrato.dto.LikeDTO;
 import br.edu.ifpb.pweb2.retrato.dto.PhotoDTO;
+import br.edu.ifpb.pweb2.retrato.model.Comment;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +30,7 @@ import java.nio.file.StandardCopyOption;
 @Controller
 @RequestMapping("/photo")
 public class PhotoController {
+
     @Autowired
     private PhotoService service;
 
@@ -46,10 +50,17 @@ public class PhotoController {
 
     @PostMapping("/upload")
     public String upload(
-            @ModelAttribute("photographerLogado") Photographer photographerLogado,
+            HttpSession session,
             @ModelAttribute @Valid Photo photo,
             BindingResult result,
             RedirectAttributes redirectAttributes) throws IOException {
+
+        Photographer photographerLogado = (Photographer) session.getAttribute("photographerLogado");
+
+        if (photographerLogado == null || photographerLogado.getId() == null) {
+            redirectAttributes.addFlashAttribute("mensagem", "Você precisa estar logado para publicar uma foto.");
+            return "redirect:/photographer/login";
+        }
 
         if (result.hasErrors()) {
             return "photo/upload";
@@ -68,18 +79,21 @@ public class PhotoController {
         }
         Photo savedPhoto = service.publish(photo);
         redirectAttributes.addFlashAttribute("mensagem", "Foto compartilhada!");
-        return "redirect:/photos/" + savedPhoto.getId();
+        return "redirect:/photographer/dashboard";
     }
 
     @PostMapping("/addComment")
-    public String addComment(@RequestBody CommentDTO comment) {
-        service.addComment(comment.photographerId(), comment.photoId(), comment.commentText());
-        return "Comment added";
+    public String addComment(@RequestParam("commentText") String commentText,
+                             @RequestParam("photographerId") Integer photographerId,
+                             @RequestParam("photoId") Integer photoId) {
+
+        service.addComment(photographerId, photoId, commentText);
+        return "redirect:/photographer/dashboard";
     }
 
     @PostMapping("/likePhoto")
-    public String likePhoto(@RequestBody LikeDTO like) {
-        service.likePhoto(like.photographerId(), like.photoId());
-        return "Like added";
+    public String likePhoto(@RequestParam Integer photographerId, @RequestParam Integer photoId, RedirectAttributes redirectAttributes) {
+        service.likePhoto(photographerId, photoId);
+        return "redirect:/photographer/dashboard";
     }
 }

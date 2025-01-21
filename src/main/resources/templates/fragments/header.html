@@ -8,11 +8,8 @@
 </head>
 <body>
 <div th:fragment="headerD" class="navbar">
-    <a th:href="@{/photographer/dashboard}"><img th:src="@{/imgs/logo2.png}" alt="logo"></a>
+    <a th:href="@{/photographer/dashboard}"><img class="logo" th:src="@{/imgs/logo2.png}" alt="logo"></a>
     <div class="menu">
-        <a th:href="@{/photographer/works}" title="Meus Trabalhos">
-            <i class="bi bi-images"></i>
-        </a>
         <a th:href="@{/photographer/profile}" title="Perfil">
             <i class="bi bi-person"></i>
         </a>

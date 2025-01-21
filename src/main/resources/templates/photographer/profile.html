@@ -5,40 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfil do Fotógrafo</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
   <link rel="stylesheet" th:href="@{/css/header.css}"/>
+  <link rel="stylesheet" th:href="@{/css/profile.css}"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
 </head>
 <body>
 <div th:insert="fragments/header :: headerD"></div>
 
-<div class="container mt-5">
+<div class="profile-body">
+  <div class="container mt-5">
+    <div class="profile-header text-center">
+      <div class="container-left">
+        <img class="profile-photo" th:src="${photographerLogado.profilePhotoPath}" alt="Foto do fotógrafo">
+        <div class="profile-header-info">
+          <h2 th:text="${photographerLogado.name}"></h2>
+          <p class="email" th:text="${photographerLogado.email}"></p>
+          <p class="location" th:text="${photographerLogado.city} + ' - ' + ${photographerLogado.country}"></p>
+        </div>
+      </div>
+      <div class="buttons">
+        <button class="btn btn-outline-primary"><i class="bi bi-eye" style="margin-right: 8px"></i>Seguindo</button>
+      </div>
+    </div>
+    <div class="container-cards">
+      <div class="card" th:each="photo : ${photos}">
+        <div th:insert="~{fragments/photocard-profile::photocard-profile(photo=${photo})}"></div>
+      </div>
+    </div>
 
-  <div class="mt-4 text-center">
-    <h2 th:text="${photographerLogado.name}"></h2>
-    <p th:text="${photographerLogado.email}"></p>
-    <p th:text="${photographerLogado.isFollowAllowed()}"></p>
-  </div>
+  <!--  <div class="follow-btn text-center">-->
+  <!--    <form th:action="@{/photographer/allow-followers/{allow}(allow=${photographerLogado.isFollowAllowed() ? false : true})}" method="POST">-->
+  <!--      <button type="submit" class="btn btn-outline-primary">-->
+  <!--        <i class="bi" th:class="${photographerLogado.isFollowAllowed() ? 'bi-person-x' : 'bi-person-plus'}"></i>-->
+  <!--        <span th:text="${photographerLogado.isFollowAllowed() ? 'Bloquear Seguidores' : 'Permitir Seguidores'}"></span>-->
+  <!--      </button>-->
+  <!--    </form>-->
+  <!--  </div>-->
+<!--    <div class="follow-list">-->
+<!--      <h3>Seguindo</h3>-->
+<!--      <ul class="list-unstyled">-->
+<!--        <li th:each="photographer : ${following}">-->
+<!--          <img th:src="${photographer.profilePhotoFile}" alt="Foto do seguido">-->
+<!--          <span th:text="${photographer.name}"></span>-->
+<!--        </li>-->
+<!--      </ul>-->
+<!--    </div>-->
 
-  <div>
-    <form th:action="@{/photographer/allow-followers/{allow}(allow=${true})}" method="POST">
-      <button type="submit" class="btn btn-primary">Permitir Seguidores</button>
-    </form>
-    <form th:action="@{/photographer/allow-followers/{allow}(allow=${false})}" method="POST">
-      <button type="submit" class="btn btn-primary">Bloquear Seguidores</button>
-    </form>
-  </div>
-
-  <div>
-    <h1>Seguindo</h1>
-    <ul>
-      <li th:each="photographer : ${following}">
-        <span th:text="${photographer.name}"></span>
-      </li>
-    </ul>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

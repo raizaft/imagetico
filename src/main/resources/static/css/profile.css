@@ -1,0 +1,109 @@
+.profile-header {
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profile-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.mt-5 {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+.container-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.card {
+    width: 100%;
+}
+
+.container-left {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: center;
+}
+
+.profile-header-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-header-info h2 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.email {
+    font-size: 14px;
+    margin: 0;
+}
+
+.location {
+    font-size: 12px;
+    margin: 0;
+}
+
+.follow-btn {
+    margin-top: 20px;
+}
+.follow-btn .btn {
+    padding: 12px 25px;
+    font-size: 1.2rem;
+}
+.follow-list {
+    margin-top: 30px;
+}
+.follow-list img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+.follow-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+@media screen and (max-width: 1199px) {
+    .container-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .container-cards {
+        grid-template-columns: 1fr;
+    }
+}

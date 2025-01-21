@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,10 +26,11 @@ public class Photographer extends User {
     private boolean suspended = false;
     private boolean followAllowed = true;
 
-    @OneToMany(mappedBy = "photographer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "photographer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Photo> photos = new ArrayList<>();
 
-    @ManyToMany
+    @ToString.Exclude
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "photographer_following",
             joinColumns = @JoinColumn(name = "follower_id"),

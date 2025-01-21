@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Foto</title>
+    <link rel="stylesheet" th:href="@{/css/photocard.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body>
+<div th:fragment="photocard (photo, photographerLogado)">
+    <div class="photocard">
+        <p style="padding: 16px; font-size: 12px; margin: 0">
+            Postado por <strong th:text="${photo.photographer.name}"></strong> em <span th:text="${photo.createdAt}"></span>
+        </p>
+        <img th:src="${photo.photoPath}" class="card-img-top" alt="Foto">
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 16px">
+            <div class="desc-like"
+                 style="display: flex;
+                flex-direction: column;
+                gap: 16px;">
+                <div class="like-comment" style="display: flex; flex-direction: row; gap: 4px">
+                    <form class="likebutton" th:action="@{/photo/likePhoto}" method="post">
+                        <input type="hidden" name="photographerId" th:value="${photographerLogado.getId()}" />
+                        <input type="hidden" name="photoId" th:value="${photo.getId()}" />
+
+                        <button type="submit" class="btn btn-light" style="background: none; padding: 0; border: none">
+                            <i class="bi" th:classappend="${photo.isLikedByUser(photographer) ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                        </button>
+                    </form>
+                    <p th:text="${photo.likes.size()}" style="margin: 0"></p>
+                    <i class="bi bi-chat" style="margin-left: 8px"></i>
+                    <p th:text="${photo.comments.size()}" style="margin: 0"></p>
+                </div>
+                <p class="card-text" th:text="${photo.description}"></p>
+            </div>
+            <div class="comment-button">
+                <form th:action="@{/photo/addComment}" method="POST" style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
+                    <textarea class="form-control" id="description" name="commentText" placeholder="Escreva um comentário..." style="height: 60px; resize: none;"></textarea>
+
+                    <input type="hidden" name="photographerId" th:value="${photographerLogado.getId()}" />
+                    <input type="hidden" name="photoId" th:value="${photo.getId()}" />
+
+                    <button type="submit" class="btn btn-light">
+                        <i class="bi bi-plus-circle-fill" style="font-size: 24px"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="comment-box" th:each="comment : ${photo.comments}" style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 16px">
+                <div class="comment-photo" style="display: flex; flex-direction: row; align-items: flex-start; gap:8px">
+                    <img class="profile-photo-comment" th:src="${comment.photographer.getProfilePhotoPath()}" alt="Foto" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover">
+                    <div class="comment-info" style="display: flex; flex-direction: column">
+                        <p class="comment-name" th:text="${comment.photographer.getName()}" style="margin: 0; font-weight: bold"></p>
+                        <p class="comment-text" th:text="${comment.commentText}" style="margin: 0"></p>
+                    </div>
+                </div>
+                <p class="comment-date" th:text="${comment.createdAt}" style="font-size: 12px"></p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,6 +1,47 @@
 body {
     background-color: #f8f9fa;
 }
+
+#b1 {
+    background-color: #747474;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 250px;
+    height: 38px;
+    font-weight: 600;
+}
+
+#b1:hover {
+    background-color: #464646;
+}
+
+.new-photo {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 12px;
+}
+
+#search {
+    width: 100%;
+    margin: 0;
+}
+
+.col-md-9{
+    width: 50%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.card {
+    width: 100%;
+}
+
 .dashboard-header {
     background-color: #343a40;
     color: #fff;

@@ -3,22 +3,36 @@
 <head>
     <title>Ver Fotógrafo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
     <link rel="stylesheet" th:href="@{/css/header.css}"/>
+    <link rel="stylesheet" th:href="@{/css/profile.css}"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
           rel="stylesheet">
 </head>
 <body>
 <div th:insert="fragments/header :: headerD"></div>
-<div>
-    <h1 th:text="${photographer.name}">Nome do Fotógrafo</h1>
+<div class="profile-body">
+    <div class="container mt-5">
+        <div class="profile-header text-center">
+            <div class="container-left">
+                <img class="profile-photo" th:src="${photographer.profilePhotoPath}" alt="Foto do fotógrafo">
+                <div class="profile-header-info">
+                    <h2 th:text="${photographer.name}"></h2>
+                    <p class="email" th:text="${photographer.email}"></p>
+                    <p class="location" th:text="${photographer.city} + ' - ' + ${photographer.country}"></p>
+                </div>
+            </div>
+            <div class="buttons">
+                <form th:action="@{/photographer/follow/{id}(id=${photographer.id})}" method="POST">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-person-add" style="margin-right: 8px"></i>Seguir</button>
+                </form>
+            </div>
+        </div>
+        <div class="container-cards">
+            <div class="card" th:each="photo : ${photos}">
+                <div th:insert="~{fragments/photocard-profile::photocard-profile(photo=${photo})}"></div>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <form th:action="@{/photographer/follow/{id}(id=${photographer.id})}" method="POST">
-        <button type="submit" class="btn btn-primary">Seguir</button>
-    </form>
-</div>
-
-<a href="#" th:href="@{/photographer/dashboard}">Voltar ao Dashboard</a>
 </body>
 </html>
