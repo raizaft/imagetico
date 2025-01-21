@@ -14,39 +14,20 @@
 <div class="container-fluid mt-5">
     <div class="row mt-4">
         <div class="col-md-9">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h4>Publicar Foto</h4>
-                    <form th:action="@{/photographer/publish}" method="post" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="photo" class="form-label">Escolher Foto</label>
-                            <input type="file" name="photo" id="photo" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <textarea name="description" class="form-control" rows="2" placeholder="Descrição"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-success">Publicar</button>
-                    </form>
-                </div>
-            </div>
-
             <div class="row">
-                <h4>Fotos Publicadas</h4>
-                <div class="col-md-6 mb-4" th:each="photo : ${publishedPhotos}">
+                <div class="col-md-6 mb-4" th:each="photo : ${photos}">
                     <div class="card">
-                        <img th:src="${photo.url}" class="card-img-top" alt="Foto publicada">
+                        <img th:src="@{${photo.photoPath}}" class="card-img-top" alt="Foto">
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${photo.title}">Título da Foto</h5>
-                            <p class="card-text" th:text="${photo.description}">Descrição da Foto</p>
-                            <div class="d-flex justify-content-between">
-
-                                <button class="btn btn-sm btn-outline-primary" th:onclick="'curtirFoto(' + ${photo.id} + ')'">
-                                    <i class="bi bi-hand-thumbs-up"></i> Curtir
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" th:onclick="'comentarFoto(' + ${photo.id} + ')'">
-                                    <i class="bi bi-chat-dots"></i> Comentar
-                                </button>
-                            </div>
+                            <p class="card-text" th:text="${photo.description}"></p>
+<!--                            <div class="d-flex justify-content-between">-->
+<!--                                <button class="btn btn-sm btn-outline-primary" th:onclick="'curtirFoto(' + ${photo.id} + ')'">-->
+<!--                                    <i class="bi bi-hand-thumbs-up"></i> Curtir-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-sm btn-outline-secondary" th:onclick="'comentarFoto(' + ${photo.id} + ')'">-->
+<!--                                    <i class="bi bi-chat-dots"></i> Comentar-->
+<!--                                </button>-->
+<!--                            </div>-->
                         </div>
                     </div>
                 </div>

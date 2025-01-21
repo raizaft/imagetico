@@ -24,9 +24,10 @@ public class Photographer extends User {
     private boolean suspended = false;
     private boolean followAllowed = true;
 
-    @OneToMany(mappedBy = "photographer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "photographer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Photo> photos = new ArrayList<>();
 
+    @ToString.Exclude
     @ManyToMany
     @JoinTable(
             name = "photographer_following",

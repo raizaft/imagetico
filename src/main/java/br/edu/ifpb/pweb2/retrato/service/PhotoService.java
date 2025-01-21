@@ -30,6 +30,9 @@ public class PhotoService {
     private LikeRepository likeRepository;
 
     public Photo publish(Photo photo) {
+        if (photo.getPhotographer() == null || photo.getPhotographer().getId() == null) {
+            throw new RuntimeException("ID do fotógrafo não pode ser nulo.");
+        }
         Photographer photographer = photographerRepository.findById(photo.getPhotographer().getId())
                 .orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado."));
 
@@ -37,7 +40,12 @@ public class PhotoService {
         photo.setComments(new ArrayList<>());
         photo.setLikes(new ArrayList<>());
 
-        return photoRepository.save(photo);
+        if (photo.getPhotoPath() != null) {
+            System.out.println(photographer.getPhotos());
+            return photoRepository.save(photo);
+        } else {
+            throw new RuntimeException("Caminho da foto não está definido.");
+        }
     }
 
     public void addComment(Integer photographerId, Integer photoId, String comment) {
@@ -70,5 +78,9 @@ public class PhotoService {
             photo.getLikes().add(likeToAdd);
         }
         photoRepository.save(photo);
+    }
+
+    public Photo findById(Integer id) {
+        return photoRepository.findById(id).orElse(null);
     }
 }
