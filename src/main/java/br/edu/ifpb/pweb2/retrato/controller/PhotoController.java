@@ -7,11 +7,13 @@ import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,7 @@ import java.nio.file.StandardCopyOption;
 @Controller
 @RequestMapping("/photo")
 public class PhotoController {
+
     @Autowired
     private PhotoService service;
 
@@ -46,10 +49,17 @@ public class PhotoController {
 
     @PostMapping("/upload")
     public String upload(
-            @ModelAttribute("photographerLogado") Photographer photographerLogado,
+            HttpSession session,
             @ModelAttribute @Valid Photo photo,
             BindingResult result,
             RedirectAttributes redirectAttributes) throws IOException {
+
+        Photographer photographerLogado = (Photographer) session.getAttribute("photographerLogado");
+
+        if (photographerLogado == null || photographerLogado.getId() == null) {
+            redirectAttributes.addFlashAttribute("mensagem", "Você precisa estar logado para publicar uma foto.");
+            return "redirect:/photographer/login";
+        }
 
         if (result.hasErrors()) {
             return "photo/upload";
@@ -68,7 +78,17 @@ public class PhotoController {
         }
         Photo savedPhoto = service.publish(photo);
         redirectAttributes.addFlashAttribute("mensagem", "Foto compartilhada!");
-        return "redirect:/photos/" + savedPhoto.getId();
+        return "redirect:/photographer/dashboard";
+    }
+
+    @GetMapping("/{id}")
+    public String viewPhoto(@PathVariable("id") Integer id, Model model) {
+        Photo photo = service.findById(id);
+        if (photo == null) {
+            return "redirect:/photographer/dashboard";
+        }
+        model.addAttribute("photo", photo);
+        return "photo/post";
     }
 
     @PostMapping("/addComment")

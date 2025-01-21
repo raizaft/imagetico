@@ -25,12 +25,15 @@ public class Photo {
 
     private LocalDateTime createdAt;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
+    @ToString.Exclude
     @ManyToOne
     private Photographer photographer;
 

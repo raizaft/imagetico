@@ -1,6 +1,7 @@
 package br.edu.ifpb.pweb2.retrato.controller;
 
 
+import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.servlet.http.HttpSession;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/photographer")
-//@SessionAttributes("photographerLogado")
 public class PhotographerController {
     @Autowired
     private PhotographerService service;
@@ -72,7 +72,8 @@ public class PhotographerController {
     @PostMapping("/login")
     public String login(@ModelAttribute @Valid Photographer photographer,
                         BindingResult result,
-                        RedirectAttributes redirectAttributes,  HttpSession session) {
+                        RedirectAttributes redirectAttributes,
+                        HttpSession session) {
         if (result.hasErrors()) {
             return "photographer/login";
         }
@@ -113,7 +114,11 @@ public class PhotographerController {
             return "redirect:/photographer/login";
         }
 
+        Photographer photographerFromDB = service.findById(photographer.getId());
+        List<Photo> photos = photographerFromDB.getPhotos();
+
         List<Photographer> photographers = service.list();
+        model.addAttribute("photos", photos);
         model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
         return "photographer/dashboard";
