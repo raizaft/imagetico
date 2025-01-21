@@ -30,7 +30,7 @@ public class Photographer extends User {
     private List<Photo> photos = new ArrayList<>();
 
     @ToString.Exclude
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "photographer_following",
             joinColumns = @JoinColumn(name = "follower_id"),

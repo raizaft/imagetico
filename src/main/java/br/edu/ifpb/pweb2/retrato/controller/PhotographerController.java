@@ -5,7 +5,9 @@ import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -152,24 +154,37 @@ public class PhotographerController {
                                      @ModelAttribute("photographerLogado") Photographer photographerLogado,
                                      RedirectAttributes redirectAttributes) {
         try {
-            Integer followerId = photographerLogado.getId();
+            Photographer managedPhotographer = service.findById(photographerLogado.getId());
+            Photographer followedPhotographer = service.findById(followedId);
 
-            service.followPhotographer(followerId, followedId);
-            redirectAttributes.addFlashAttribute("mensagem", "Você começou a seguir o fotógrafo!");
+            if (managedPhotographer.getFollowing().contains(followedPhotographer)) {
+                managedPhotographer.getFollowing().remove(followedPhotographer);
+                redirectAttributes.addFlashAttribute("mensagem", "Você deixou de seguir o fotógrafo!");
+            } else {
+                managedPhotographer.getFollowing().add(followedPhotographer);
+                redirectAttributes.addFlashAttribute("mensagem", "Você começou a seguir o fotógrafo!");
+            }
+
+            service.save(managedPhotographer);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao tentar seguir o fotógrafo: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao tentar seguir/deixar de seguir o fotógrafo: " + e.getMessage());
         }
-        return "redirect:/photographer/profile";
+        return "redirect:/photographer/{followedId}/view";
     }
 
-    @GetMapping("/{id}/view")
-    public String viewPhotographer(@PathVariable Integer id, Model model) {
+    @GetMapping("/{photographerId}/view")
+    public String viewPhotographer(@PathVariable("photographerId") Integer id,
+                                   @ModelAttribute("photographerLogado") Photographer photographerLogado, Model model) {
         Photographer photographer = service.findById(id);
+
         List<Photo> photos = photographer.getPhotos();
         Collections.reverse(photos);
 
+        boolean isFollowing = photographerLogado.getFollowing().contains(photographer);
+
         model.addAttribute("photos", photos);
         model.addAttribute("photographer", photographer);
+        model.addAttribute("isFollowing", isFollowing);
         return "photographer/view";
     }
 

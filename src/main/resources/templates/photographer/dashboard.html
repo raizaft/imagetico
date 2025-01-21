@@ -27,7 +27,7 @@
             <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between align-items-center" th:each="photographer : ${photographers}">
                     <span th:text="${photographer.name}">Fotógrafo</span>
-                    <a th:href="@{/photographer/{id}/view(id=${photographer.id})}" class="btn btn-outline-info">Ver Perfil</a>
+                    <a th:href="@{/photographer/{photographerId}/view(photographerId=${photographer.id})}" class="btn btn-outline-info">Ver Perfil</a>
                 </li>
             </ul>
         </div>
