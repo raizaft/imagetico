@@ -2,7 +2,6 @@ package br.edu.ifpb.pweb2.retrato.service;
 
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.repository.PhotographerRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +18,10 @@ public class PhotographerService {
             throw new IllegalArgumentException("Já existe uma conta com esse e-mail.");
         }
        return repository.save(photographer);
+    }
+
+    public Photographer save(Photographer photographer) {
+        return repository.save(photographer);
     }
 
     public Photographer login(String name, String email) {
@@ -60,8 +63,26 @@ public class PhotographerService {
 
         Photographer follower = findById(followerId);
         Photographer followed = findById(followedId);
+        if(follower.getFollowing().contains(followed)) {
+            throw new IllegalArgumentException("Fotografo já é seguido");
+        }
         follower.getFollowing().add(followed);
 
         repository.save(followed);
+    }
+
+    public void followAllowedAction(Photographer photographer){
+        if(photographer.isFollowAllowed()) {
+            photographer.setFollowAllowed(false);
+        } else{
+            photographer.setFollowAllowed(true);
+        }
+    }
+
+
+    public List<Photographer> getFollowing(Integer photographerId) {
+        Photographer photographer = repository.findById(photographerId)
+                .orElseThrow(() -> new IllegalArgumentException("Photographer not found with ID: " + photographerId));
+        return photographer.getFollowing();
     }
 }
