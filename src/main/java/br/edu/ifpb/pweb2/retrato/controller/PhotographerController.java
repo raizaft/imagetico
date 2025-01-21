@@ -56,19 +56,13 @@ public class PhotographerController {
             Files.createDirectories(filePath.getParent());
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             photographer.setProfilePhotoPath("/uploads/" + fileName);
+        } else {
+            photographer.setProfilePhotoPath("/uploads/generic-user.png");
         }
-
 
         service.register(photographer);
         redirectAttributes.addFlashAttribute("mensagem", "Fotógrafo cadastrado com sucesso!");
-        return "redirect:/photographer/success";
-    }
-
-    @GetMapping("/success")
-    public String success(Model model) {
-        List<Photographer> photographers = service.list();
-        model.addAttribute("photographers", photographers);
-        return "photographer/success";
+        return "redirect:/photographer/login";
     }
 
     @PostMapping("/login")

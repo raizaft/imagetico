@@ -98,7 +98,7 @@ public class PhotoController {
                              @RequestParam("photoId") Integer photoId) {
 
         service.addComment(photographerId, photoId, commentText);
-        return "Comment added";
+        return "redirect:/photographer/dashboard";
     }
 
     @PostMapping("/likePhoto")
