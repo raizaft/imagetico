@@ -11,17 +11,30 @@
 </head>
 <body>
 <div th:insert="fragments/header :: headerD"></div>
+
 <div class="container mt-5">
 
   <div class="mt-4 text-center">
     <h2 th:text="${photographerLogado.name}"></h2>
     <p th:text="${photographerLogado.email}"></p>
+    <p th:text="${photographerLogado.isFollowAllowed()}"></p>
   </div>
 
   <div>
+    <form th:action="@{/photographer/allow-followers/{allow}(allow=${true})}" method="POST">
+      <button type="submit" class="btn btn-primary">Permitir Seguidores</button>
+    </form>
+    <form th:action="@{/photographer/allow-followers/{allow}(allow=${false})}" method="POST">
+      <button type="submit" class="btn btn-primary">Bloquear Seguidores</button>
+    </form>
+  </div>
 
-    <h1> Seguindo </h1>
+  <div>
+    <h1>Seguindo</h1>
     <ul>
+      <li th:each="photographer : ${following}">
+        <span th:text="${photographer.name}"></span>
+      </li>
     </ul>
   </div>
 </div>
