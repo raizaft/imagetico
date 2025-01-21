@@ -1,0 +1,8 @@
+.photocard {
+    width: 100%;
+    height: 200px;
+}
+#likeButton {
+    background:none;
+    border: none;
+}

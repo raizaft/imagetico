@@ -81,15 +81,15 @@ public class PhotoController {
         return "redirect:/photographer/dashboard";
     }
 
-    @GetMapping("/{id}")
-    public String viewPhoto(@PathVariable("id") Integer id, Model model) {
-        Photo photo = service.findById(id);
-        if (photo == null) {
-            return "redirect:/photographer/dashboard";
-        }
-        model.addAttribute("photo", photo);
-        return "photo/post";
-    }
+//    @GetMapping("/{id}")
+//    public String viewPhoto(@PathVariable("id") Integer id, Model model) {
+//        Photo photo = service.findById(id);
+//        if (photo == null) {
+//            return "redirect:/photographer/dashboard";
+//        }
+//        model.addAttribute("photo", photo);
+//        return "photo/post";
+//    }
 
     @PostMapping("/addComment")
     public String addComment(@RequestBody CommentDTO comment) {
@@ -98,8 +98,8 @@ public class PhotoController {
     }
 
     @PostMapping("/likePhoto")
-    public String likePhoto(@RequestBody LikeDTO like) {
-        service.likePhoto(like.photographerId(), like.photoId());
-        return "Like added";
+    public String likePhoto(@RequestParam Integer photographerId, @RequestParam Integer photoId, RedirectAttributes redirectAttributes) {
+        service.likePhoto(photographerId, photoId);
+        return "redirect:/photographer/dashboard";
     }
 }

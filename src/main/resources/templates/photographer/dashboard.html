@@ -10,27 +10,20 @@
 </head>
 <body>
 <div th:insert="fragments/header :: headerD"></div>
-
 <div class="container-fluid mt-5">
     <div class="row mt-4">
         <div class="col-md-9">
-            <div class="row">
-                <div class="col-md-6 mb-4" th:each="photo : ${photos}">
-                    <div class="card">
-                        <img th:src="@{${photo.photoPath}}" class="card-img-top" alt="Foto">
-                        <div class="card-body">
-                            <p class="card-text" th:text="${photo.description}"></p>
-<!--                            <div class="d-flex justify-content-between">-->
-<!--                                <button class="btn btn-sm btn-outline-primary" th:onclick="'curtirFoto(' + ${photo.id} + ')'">-->
-<!--                                    <i class="bi bi-hand-thumbs-up"></i> Curtir-->
-<!--                                </button>-->
-<!--                                <button class="btn btn-sm btn-outline-secondary" th:onclick="'comentarFoto(' + ${photo.id} + ')'">-->
-<!--                                    <i class="bi bi-chat-dots"></i> Comentar-->
-<!--                                </button>-->
-<!--                            </div>-->
-                        </div>
-                    </div>
+            <div class="new-photo">
+                <a href="../photo/form">
+                    <button type="submit" id="b1" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-lg"></i>Publicar Foto</button>
+                </a>
+                <div id="search" class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Pesquisar fotógrafo" aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i class="bi bi-search"></i></button>
                 </div>
+            </div>
+            <div class="card" th:each="photo : ${followingPhotos}">
+                <div th:insert="~{fragments/photocard::photocard(photo=${photo})}"></div>
             </div>
         </div>
         <div class="col-md-3 border-start">

@@ -41,7 +41,6 @@ public class PhotoService {
         photo.setLikes(new ArrayList<>());
 
         if (photo.getPhotoPath() != null) {
-            System.out.println(photographer.getPhotos());
             return photoRepository.save(photo);
         } else {
             throw new RuntimeException("Caminho da foto não está definido.");
@@ -64,11 +63,13 @@ public class PhotoService {
     public void likePhoto(Integer photographerId, Integer photoId) {
         Photo photo = photoRepository.findById(photoId).orElseThrow();
         Photographer photographer = photographerRepository.findById(photographerId).orElseThrow();
+
         Optional<Like> likeExists = likeRepository.findByPhotographerAndPhoto(photographer, photo);
 
         if (likeExists.isPresent()) {
-            photo.getLikes().remove(likeExists.get());
-            likeRepository.delete(likeExists.get());
+            Like likeToRemove = likeExists.get();
+            photo.getLikes().remove(likeToRemove);
+            likeRepository.delete(likeToRemove);
         } else {
             Like likeToAdd = Like.builder()
                     .photographer(photographer)

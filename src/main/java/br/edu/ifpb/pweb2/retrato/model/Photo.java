@@ -37,6 +37,10 @@ public class Photo {
     @ManyToOne
     private Photographer photographer;
 
+    public boolean isLikedByUser(Photographer photographer) {
+        return likes.stream().anyMatch(like -> like.getPhotographer().equals(photographer));
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

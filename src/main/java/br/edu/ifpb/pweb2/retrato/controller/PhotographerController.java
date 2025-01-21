@@ -20,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -116,8 +118,16 @@ public class PhotographerController {
 
         Photographer photographerFromDB = service.findById(photographer.getId());
         List<Photo> photos = photographerFromDB.getPhotos();
+        Collections.reverse(photos);
+
+        List<Photographer> followingPhotographers = photographerFromDB.getFollowing();
+        List<Photo> followingPhotos = new ArrayList<>();
+        for (Photographer followedPhotographer : followingPhotographers) {
+            followingPhotos.addAll(followedPhotographer.getPhotos());
+        }
 
         List<Photographer> photographers = service.list();
+        model.addAttribute("followingPhotos", followingPhotos);
         model.addAttribute("photos", photos);
         model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
