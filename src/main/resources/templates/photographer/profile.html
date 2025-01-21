@@ -23,8 +23,26 @@
           <p class="location" th:text="${photographerLogado.city} + ' - ' + ${photographerLogado.country}"></p>
         </div>
       </div>
-      <div class="buttons">
-        <button class="btn btn-outline-primary"><i class="bi bi-eye" style="margin-right: 8px"></i>Seguindo</button>
+      <div class="buttons" style="display: flex; align-items: center; gap: 16px">
+        <div class="follow-btn text-center">
+          <form th:action="@{/photographer/allow-followers/{allow}(allow=${photographerLogado.isFollowAllowed() ? false : true})}" method="POST">
+            <button type="submit" class="btn btn-outline-primary">
+              <i class="bi" th:class="${photographerLogado.isFollowAllowed() ? 'bi-person-x' : 'bi-person-plus'}"></i>
+              <span th:text="${photographerLogado.isFollowAllowed() ? 'Bloquear Seguidores' : 'Permitir Seguidores'}"></span>
+            </button>
+          </form>
+        </div>
+        <a th:href="@{/photographer/{id}/following(id=${photographerLogado.id})}">
+          <button class="btn btn-outline-primary" style="display: flex; flex-direction: row; align-items: center">
+            <i class="bi bi-people-fill" style="margin-right: 8px; padding: 0"></i>
+            <p th:text="${following.size()}" style="margin: 0"></p>
+          </button>
+        </a>
+        <div class="new-photo">
+          <a href="../photo/form">
+            <button type="submit" id="b1" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-lg"></i>Publicar Foto</button>
+          </a>
+        </div>
       </div>
     </div>
     <div class="container-cards">
@@ -32,24 +50,6 @@
         <div th:insert="~{fragments/photocard-profile::photocard-profile(photo=${photo})}"></div>
       </div>
     </div>
-
-  <!--  <div class="follow-btn text-center">-->
-  <!--    <form th:action="@{/photographer/allow-followers/{allow}(allow=${photographerLogado.isFollowAllowed() ? false : true})}" method="POST">-->
-  <!--      <button type="submit" class="btn btn-outline-primary">-->
-  <!--        <i class="bi" th:class="${photographerLogado.isFollowAllowed() ? 'bi-person-x' : 'bi-person-plus'}"></i>-->
-  <!--        <span th:text="${photographerLogado.isFollowAllowed() ? 'Bloquear Seguidores' : 'Permitir Seguidores'}"></span>-->
-  <!--      </button>-->
-  <!--    </form>-->
-  <!--  </div>-->
-<!--    <div class="follow-list">-->
-<!--      <h3>Seguindo</h3>-->
-<!--      <ul class="list-unstyled">-->
-<!--        <li th:each="photographer : ${following}">-->
-<!--          <img th:src="${photographer.profilePhotoFile}" alt="Foto do seguido">-->
-<!--          <span th:text="${photographer.name}"></span>-->
-<!--        </li>-->
-<!--      </ul>-->
-<!--    </div>-->
 
   </div>
 </div>

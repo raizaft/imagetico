@@ -73,29 +73,6 @@
     margin: 0;
 }
 
-.follow-btn {
-    margin-top: 20px;
-}
-.follow-btn .btn {
-    padding: 12px 25px;
-    font-size: 1.2rem;
-}
-.follow-list {
-    margin-top: 30px;
-}
-.follow-list img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-}
-.follow-list li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
 @media screen and (max-width: 1199px) {
     .container-cards {
         grid-template-columns: 1fr 1fr;

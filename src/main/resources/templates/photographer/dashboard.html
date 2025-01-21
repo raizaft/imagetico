@@ -17,13 +17,9 @@
                 <a href="../photo/form">
                     <button type="submit" id="b1" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-plus-lg"></i>Publicar Foto</button>
                 </a>
-                <div id="search" class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Pesquisar fotógrafo" aria-label="Recipient's username" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i class="bi bi-search"></i></button>
-                </div>
             </div>
             <div class="card" th:each="photo : ${followingPhotos}">
-                <div th:insert="~{fragments/photocard::photocard(photo=${photo}, photographerLogado=${photographerLogado})}"></div>
+                <div th:insert="~{fragments/photocard::photocard(photo=${photo}, photographerLogado=${photographerLogado}, likedByPhotographer=${likedByPhotographer})}"></div>
             </div>
         </div>
         <div class="col-md-3 border-start">

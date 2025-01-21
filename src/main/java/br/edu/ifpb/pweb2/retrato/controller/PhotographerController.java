@@ -123,6 +123,7 @@ public class PhotographerController {
         }
 
         List<Photographer> photographers = service.list();
+        model.addAttribute("followingPhotographers", followingPhotographers);
         model.addAttribute("followingPhotos", followingPhotos);
         model.addAttribute("photos", photos);
         model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
@@ -186,6 +187,16 @@ public class PhotographerController {
         model.addAttribute("photographer", photographer);
         model.addAttribute("isFollowing", isFollowing);
         return "photographer/view";
+    }
+
+    @GetMapping("/{photographerId}/following")
+    public String following(@PathVariable("photographerId") Integer id,
+                            @ModelAttribute("photographerLogado") Photographer photographerLogado, Model model) {
+        Photographer photographer = service.findById(id);
+        List<Photographer> following = photographer.getFollowing();
+        model.addAttribute("photographer", photographer);
+        model.addAttribute("following", following);
+        return "photographer/following";
     }
 
     @PostMapping("/allow-followers/{allow}")
