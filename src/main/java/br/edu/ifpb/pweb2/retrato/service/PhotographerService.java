@@ -2,6 +2,7 @@ package br.edu.ifpb.pweb2.retrato.service;
 
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.repository.PhotographerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class PhotographerService {
        return repository.save(photographer);
     }
 
+    @Transactional
     public Photographer save(Photographer photographer) {
         return repository.save(photographer);
     }
@@ -51,6 +53,7 @@ public class PhotographerService {
         photographer.setSuspended(false);
         repository.save(photographer);
     }
+
 
     public Photographer findById(Integer id) {
         return repository.findById(id).orElse(null);
