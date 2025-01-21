@@ -9,7 +9,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    width: 250px;
+    width: 200px;
     height: 38px;
     font-weight: 600;
 }
@@ -21,13 +21,9 @@ body {
 .new-photo {
     display: flex;
     flex-direction: row;
+    justify-content: center;
     width: 100%;
     gap: 12px;
-}
-
-#search {
-    width: 100%;
-    margin: 0;
 }
 
 .col-md-9{
