@@ -20,10 +20,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/photographer")
-@SessionAttributes("photographerLogado")
+//@SessionAttributes("photographerLogado")
 public class PhotographerController {
     @Autowired
     private PhotographerService service;
@@ -113,7 +114,7 @@ public class PhotographerController {
         }
 
         List<Photographer> photographers = service.list();
-        model.addAttribute("photographers", photographers);
+        model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
         return "photographer/dashboard";
     }
@@ -121,8 +122,11 @@ public class PhotographerController {
     @GetMapping("/profile")
     public String profile(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
         model.addAttribute("photographerLogado", photographer);
+        List<Photographer> following = service.findById(photographer.getId()).getFollowing();
+        model.addAttribute("following", following);
         return "photographer/profile";
     }
+
 
     @PostMapping("/follow/{followedId}")
     public String followPhotographer(@PathVariable("followedId") Integer followedId,
@@ -130,6 +134,7 @@ public class PhotographerController {
                                      RedirectAttributes redirectAttributes) {
         try {
             Integer followerId = photographerLogado.getId();
+
             service.followPhotographer(followerId, followedId);
             redirectAttributes.addFlashAttribute("mensagem", "Você começou a seguir o fotógrafo!");
         } catch (Exception e) {
@@ -138,17 +143,19 @@ public class PhotographerController {
         return "redirect:/photographer/profile";
     }
 
-    @GetMapping("/following")
-    public String listFollowing(@ModelAttribute("photographerLogado") Photographer photographerLogado, Model model) {
-        List<Photographer> following = photographerLogado.getFollowing();
-        model.addAttribute("following", following);
-        return "photographer/profile";
-    }
-
     @GetMapping("/{id}/view")
     public String viewPhotographer(@PathVariable Integer id, Model model) {
         Photographer photographer = service.findById(id);
         model.addAttribute("photographer", photographer);
         return "photographer/view";
     }
+
+    @PostMapping("/allow-followers/{allow}")
+    public String allowFollower(@ModelAttribute("photographerLogado") Photographer photographerLogado,
+                                @PathVariable boolean allow){
+        photographerLogado.setFollowAllowed(allow);
+        service.save(photographerLogado);
+        return "redirect:/photographer/profile";
+    }
+
 }
