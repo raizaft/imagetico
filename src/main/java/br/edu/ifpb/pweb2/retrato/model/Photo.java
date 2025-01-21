@@ -2,6 +2,8 @@ package br.edu.ifpb.pweb2.retrato.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -35,6 +37,7 @@ public class Photo {
 
     @ToString.Exclude
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Photographer photographer;
 
     public boolean isLikedByUser(Photographer photographer) {

@@ -136,9 +136,19 @@ public class PhotographerController {
 
     @GetMapping("/profile")
     public String profile(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
-        model.addAttribute("photographerLogado", photographer);
+        if (photographer == null || photographer.getId() == null) {
+            return "redirect:/photographer/login";
+        }
+
+        Photographer photographerFromDB = service.findById(photographer.getId());
+        List<Photo> photos = photographerFromDB.getPhotos();
+        Collections.reverse(photos);
+
         List<Photographer> following = service.findById(photographer.getId()).getFollowing();
+
+        model.addAttribute("photographerLogado", photographer);
         model.addAttribute("following", following);
+        model.addAttribute("photos", photos);
         return "photographer/profile";
     }
 
