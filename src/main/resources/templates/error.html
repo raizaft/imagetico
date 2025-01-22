@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Erro</title>
+    <link rel="stylesheet" href="/css/error.css"> <!-- Caminho relativo -->
+</head>
+<body>
+<div class="container">
+    <h1>Oops!</h1>
+    <h3>Algo deu errado.</h3>
+    <p th:text="'Status: ' + ${status}"></p>
+    <p th:text="'Erro: ' + ${error}"></p>
+    <p th:text="'Mensagem: ' + ${message}"></p>
+    <a th:href="@{/photographer/login}">Voltar para a página inicial</a>
+    <footer>© 2025 - IMAGÉTICO</footer>
+</div>
+</body>
+</html>
+
