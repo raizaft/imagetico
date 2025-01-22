@@ -79,7 +79,7 @@ public class AdministratorController {
         photographerService.activatePhotographer(photographerId);
         return "redirect:/administrator/dashboardAdm";
     }
-
+//não funciona
     @GetMapping("/logout")
     public String logout(SessionStatus sessionStatus, RedirectAttributes redirectAttributes) {
         sessionStatus.setComplete();

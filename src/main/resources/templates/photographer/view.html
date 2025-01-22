@@ -25,8 +25,8 @@
                 <form th:action="@{/photographer/follow/{followedId}(followedId=${photographer.id})}" method="POST">
                     <button type="submit" class="btn btn-primary" th:disabled="!${photographer.isFollowAllowed()}" >
                         <i class="bi" style="margin-right: 8px"
-                           th:classappend="${isFollowing == 'sim'} ? 'bi-person-check' : 'bi-person-add'"></i>
-                        <span th:text="${isFollowing == 'sim'} ? 'Deixar de seguir' : 'Seguir'"></span>
+                           th:classappend="${isFollowing} ? 'bi-person-check' : 'bi-person-add'"></i>
+                        <span th:text="${isFollowing} ? 'Deixar de seguir' : 'Seguir'"></span>
                     </button>
                 </form>
             </div>
