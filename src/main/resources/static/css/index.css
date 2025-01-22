@@ -1,0 +1,26 @@
+* {
+    margin: 0;
+    font-family: Lato, sans-serif;
+}
+
+body {
+    width: 100%;
+
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: calc(100vh - 50px);
+    background-image: url('../imgs/bgraiza.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.logo-inicio {
+    width: 40%;
+}
+
