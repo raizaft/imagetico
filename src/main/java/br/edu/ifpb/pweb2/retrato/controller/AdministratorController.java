@@ -4,6 +4,7 @@ import br.edu.ifpb.pweb2.retrato.model.Administrator;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.AdministratorService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +18,6 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/administrator")
-@SessionAttributes("admLogado")
 public class AdministratorController {
 
     @Autowired
@@ -34,20 +34,22 @@ public class AdministratorController {
     @PostMapping("/loginAdm")
     public String login(@ModelAttribute Administrator adm,
                         BindingResult result,
-                        RedirectAttributes redirectAttributes, Model model) {
+                        RedirectAttributes redirectAttributes,
+                        HttpSession session) {
         if (result.hasErrors()) {
             return "administrator/loginAdm";
         }
+
         Administrator admLogado = service.login(adm.getEmail(), adm.getPassword());
-        if (admLogado != null) {
-            model.addAttribute("admLogado", admLogado);
-            redirectAttributes.addFlashAttribute("mensagem", "Usuario logado com sucesso!");
-            return "redirect:/administrator/dashboardAdm";
-        } else {
+
+        if (admLogado == null) {
             redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
             return "redirect:/administrator/loginAdm";
         }
 
+        session.setAttribute("admLogado", admLogado);
+        redirectAttributes.addFlashAttribute("mensagem", "Usuario logado com sucesso!");
+        return "redirect:/administrator/dashboardAdm";
     }
 
     @GetMapping("/loginAdm")
@@ -57,10 +59,11 @@ public class AdministratorController {
     }
 
     @GetMapping("/dashboardAdm")
-    public String dashboard(@SessionAttribute("admLogado") Administrator adm, Model model) {
+    public String dashboard(@SessionAttribute(name = "admLogado", required = false) Administrator adm, Model model) {
         if (adm == null || adm.getId() == null) {
             return "redirect:/administrator/loginAdm";
         }
+
         List<Photographer> photographers = photographerService.list();
         model.addAttribute("photographers", photographers);
         model.addAttribute("administrator", adm);
@@ -79,11 +82,18 @@ public class AdministratorController {
         photographerService.activatePhotographer(photographerId);
         return "redirect:/administrator/dashboardAdm";
     }
-//não funciona
-    @GetMapping("/logout")
-    public String logout(SessionStatus sessionStatus, RedirectAttributes redirectAttributes) {
-        sessionStatus.setComplete();
-        redirectAttributes.addFlashAttribute("mensagem", "Logout realizado com sucesso!");
+
+//    @GetMapping("/logout")
+//    public String logout(SessionStatus sessionStatus, RedirectAttributes redirectAttributes) {
+//        sessionStatus.setComplete();
+//        redirectAttributes.addFlashAttribute("mensagem", "Logout realizado com sucesso!");
+//        return "redirect:/administrator/loginAdm";
+//    }
+
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("photographerLogado");
+        session.invalidate();
         return "redirect:/administrator/loginAdm";
     }
 }
