@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -77,5 +78,12 @@ public class AdministratorController {
     public String activatePhotographer(@RequestParam Integer photographerId) {
         photographerService.activatePhotographer(photographerId);
         return "redirect:/administrator/dashboardAdm";
+    }
+
+    @GetMapping("/logout")
+    public String logout(SessionStatus sessionStatus, RedirectAttributes redirectAttributes) {
+        sessionStatus.setComplete();
+        redirectAttributes.addFlashAttribute("mensagem", "Logout realizado com sucesso!");
+        return "redirect:/administrator/loginAdm";
     }
 }
