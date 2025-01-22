@@ -25,6 +25,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,7 +36,9 @@ public class PhotographerController {
 
     @ModelAttribute("photographerLogado")
     public Photographer getLoggedInPhotographer(HttpSession session) {
-        return (Photographer) session.getAttribute("photographerLogado");
+        return Optional.ofNullable(session.getAttribute("photographerLogado"))
+                .map(photographer -> service.findById(((Photographer) photographer).getId()))
+                .orElse(null);
     }
 
     @GetMapping("/form")
@@ -153,20 +156,20 @@ public class PhotographerController {
     @PostMapping("/follow/{followedId}")
     public String followPhotographer(@PathVariable("followedId") Integer followedId,
                                      @ModelAttribute("photographerLogado") Photographer photographerLogado,
-                                     RedirectAttributes redirectAttributes) {
+                                     RedirectAttributes redirectAttributes,
+                                     Model model) {
         try {
-            Photographer managedPhotographer = service.findById(photographerLogado.getId());
             Photographer followedPhotographer = service.findById(followedId);
 
-            if (managedPhotographer.getFollowing().contains(followedPhotographer)) {
-                managedPhotographer.getFollowing().remove(followedPhotographer);
+            if (photographerLogado.getFollowing().contains(followedPhotographer)) {
+                photographerLogado.getFollowing().remove(followedPhotographer);
                 redirectAttributes.addFlashAttribute("mensagem", "Você deixou de seguir o fotógrafo!");
             } else {
-                managedPhotographer.getFollowing().add(followedPhotographer);
+                photographerLogado.getFollowing().add(followedPhotographer);
                 redirectAttributes.addFlashAttribute("mensagem", "Você começou a seguir o fotógrafo!");
             }
-
-            service.save(managedPhotographer);
+            service.save(photographerLogado);
+            model.addAttribute("isFollowing", isFollowing(photographerLogado, followedPhotographer));
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao tentar seguir/deixar de seguir o fotógrafo: " + e.getMessage());
         }
@@ -181,12 +184,14 @@ public class PhotographerController {
         List<Photo> photos = photographer.getPhotos();
         Collections.reverse(photos);
 
-        boolean isFollowing = photographerLogado.getFollowing().contains(photographer);
-
         model.addAttribute("photos", photos);
         model.addAttribute("photographer", photographer);
-        model.addAttribute("isFollowing", isFollowing);
+        model.addAttribute("isFollowing", isFollowing(photographerLogado, photographer));
         return "photographer/view";
+    }
+
+    private static boolean isFollowing(Photographer photographerLogado, Photographer photographer) {
+        return photographerLogado.getFollowing().stream().anyMatch(follower -> follower.getId().equals(photographer.getId()));
     }
 
     @GetMapping("/{photographerId}/following")

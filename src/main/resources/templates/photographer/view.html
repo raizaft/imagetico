@@ -12,7 +12,6 @@
 <div th:insert="fragments/header :: headerD"></div>
 <div class="profile-body">
     <div class="container mt-5">
-        <div th:if="${mensagem}" class="alert alert-success" role="alert" th:text="${mensagem}"></div>
         <div class="profile-header text-center">
             <div class="container-left">
                 <img class="profile-photo" th:src="${photographer.profilePhotoPath}" alt="Foto do fotógrafo">
@@ -24,7 +23,7 @@
             </div>
             <div class="buttons">
                 <form th:action="@{/photographer/follow/{followedId}(followedId=${photographer.id})}" method="POST">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" th:disabled="!${photographer.isFollowAllowed()}" >
                         <i class="bi" style="margin-right: 8px"
                            th:classappend="${isFollowing} ? 'bi-person-check' : 'bi-person-add'"></i>
                         <span th:text="${isFollowing} ? 'Deixar de seguir' : 'Seguir'"></span>
@@ -37,7 +36,6 @@
                 <div th:insert="~{fragments/photocard-profile::photocard-profile(photo=${photo})}"></div>
             </div>
         </div>
-        <div th:if="${mensagemErro}" class="alert alert-danger" role="alert" th:text="${mensagemErro}"></div>
     </div>
 </div>
 </body>
