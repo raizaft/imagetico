@@ -50,6 +50,11 @@ public class PhotoService {
     public void addComment(Integer photographerId, Integer photoId, String comment) {
         Photo photo = photoRepository.findById(photoId).orElseThrow();
         Photographer photographer = photographerRepository.findById(photographerId).orElseThrow();
+
+        if (!photographer.isCanComment() && !photo.getPhotographer().getId().equals(photographerId)) {
+            throw new RuntimeException("Você está suspenso de comentar em fotos de terceiros.");
+        }
+
         Comment commentToAdd = Comment.builder()
                 .commentText(comment)
                 .photographer(photographer)

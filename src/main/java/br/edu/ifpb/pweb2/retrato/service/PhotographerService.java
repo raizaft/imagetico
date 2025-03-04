@@ -60,6 +60,24 @@ public class PhotographerService {
         return repository.findById(id).orElse(null);
     }
 
+    public void suspendComments(Integer photographerId) {
+        Photographer photographer = repository.findById(photographerId).orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado"));
+        photographer.setCanComment(false);
+        repository.save(photographer);
+    }
+
+    public void allowComments(Integer photographerId) {
+        Photographer photographer = repository.findById(photographerId).orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado"));
+        photographer.setCanComment(true);
+        repository.save(photographer);
+    }
+
+
+
+
+
+
+
     public void followPhotographer(Integer followerId, Integer followedId) {
         if (followerId.equals(followedId)) {
             throw new IllegalArgumentException("Um fotógrafo não pode seguir a si mesmo.");
