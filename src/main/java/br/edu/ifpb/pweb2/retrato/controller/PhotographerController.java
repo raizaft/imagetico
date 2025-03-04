@@ -5,9 +5,7 @@ import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +29,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/photographer")
 public class PhotographerController {
+
     @Autowired
     private PhotographerService service;
 
@@ -93,6 +92,10 @@ public class PhotographerController {
 
         session.setAttribute("photographerLogado", photographerLogado);
         redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
+
+        if (photographerLogado.isAdmin()) {
+            return "redirect:/photographer/dashboardAdm";
+        }
         return "redirect:/photographer/dashboard";
     }
 
@@ -115,6 +118,10 @@ public class PhotographerController {
             return "redirect:/photographer/login";
         }
 
+        if (photographer.isAdmin()) {
+            return "redirect:/photographer/dashboardAdm";
+        }
+
         Photographer photographerFromDB = service.findById(photographer.getId());
         List<Photo> photos = photographerFromDB.getPhotos();
         Collections.reverse(photos);
@@ -133,6 +140,51 @@ public class PhotographerController {
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
         return "photographer/dashboard";
     }
+
+
+    @GetMapping("/dashboardAdm")
+    public String dashboardAdmin(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
+        if (photographer == null || photographer.getId() == null || !photographer.isAdmin()) {
+            return "redirect:/photographer/login";
+        }
+
+        List<Photographer> photographers = service.list();
+        model.addAttribute("photographers", photographers);
+        model.addAttribute("photographerLogado", photographer);
+
+        return "administrator/dashboardAdm";
+    }
+
+    @PostMapping("/suspend")
+    public String suspendPhotographer(@RequestParam Integer photographerId, @ModelAttribute("photographerLogado") Photographer admin) {
+        if (admin == null || !admin.isAdmin()) {
+            return "redirect:/photographer/login";
+        }
+        service.suspendPhotographer(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
+    @PostMapping("/activate")
+    public String activatePhotographer(@RequestParam Integer photographerId, @ModelAttribute("photographerLogado") Photographer admin) {
+        if (admin == null || !admin.isAdmin()) {
+            return "redirect:/photographer/login";
+        }
+        service.activatePhotographer(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
+    @PostMapping("/suspend-comments")
+    public String suspendComments(@RequestParam Integer photographerId) {
+       service.suspendComments(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
+    @PostMapping("/allow-comments")
+    public String allowComments(@RequestParam Integer photographerId) {
+        service.allowComments(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
 
     @GetMapping("/profile")
     public String profile(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {

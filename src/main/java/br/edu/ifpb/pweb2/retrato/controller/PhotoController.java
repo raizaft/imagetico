@@ -1,20 +1,12 @@
 package br.edu.ifpb.pweb2.retrato.controller;
 
-import br.edu.ifpb.pweb2.retrato.dto.CommentDTO;
-import br.edu.ifpb.pweb2.retrato.dto.LikeDTO;
-import br.edu.ifpb.pweb2.retrato.dto.PhotoDTO;
-import br.edu.ifpb.pweb2.retrato.model.Comment;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,9 +77,14 @@ public class PhotoController {
     @PostMapping("/addComment")
     public String addComment(@RequestParam("commentText") String commentText,
                              @RequestParam("photographerId") Integer photographerId,
-                             @RequestParam("photoId") Integer photoId) {
+                             @RequestParam("photoId") Integer photoId, RedirectAttributes redirectAttributes) {
 
-        service.addComment(photographerId, photoId, commentText);
+        try {
+            service.addComment(photographerId, photoId, commentText);
+            redirectAttributes.addFlashAttribute("mensagem", "Comentário adicionado com sucesso!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+        }
         return "redirect:/photographer/dashboard";
     }
 
