@@ -8,6 +8,7 @@ import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,6 +36,9 @@ public class PhotographerController {
     private PhotographerService service;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private PhotoService servicePhoto;
 
 
@@ -57,6 +61,9 @@ public class PhotographerController {
         if (result.hasErrors()) {
             return "photographer/form";
         }
+
+        photographer.setPassword(passwordEncoder.encode(photographer.getPassword()));
+
         MultipartFile file = photographer.getProfilePhotoFile();
         if (file != null && !file.isEmpty()) {
             String uploadDir = "uploads/";
@@ -74,32 +81,32 @@ public class PhotographerController {
         return "redirect:/photographer/login";
     }
 
-    @PostMapping("/login")
-    public String login(@ModelAttribute @Valid Photographer photographer,
-                        BindingResult result,
-                        RedirectAttributes redirectAttributes,
-                        HttpSession session) {
-        if (result.hasErrors()) {
-            return "photographer/login";
-        }
-
-        Photographer photographerLogado = service.login(photographer.getName(), photographer.getEmail());
-
-        if (photographerLogado == null) {
-            redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
-            return "redirect:/photographer/login";
-        }
-
-        if (photographerLogado.isSuspended()) {
-            redirectAttributes.addFlashAttribute("mensagem", "Sua conta está suspensa. Entre em contato com o suporte.");
-            return "redirect:/photographer/login";
-        }
-
-        session.setAttribute("photographerLogado", photographerLogado);
-        redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
-
-        return "redirect:/photographer/dashboard";
-    }
+//    @PostMapping("/login")
+//    public String login(@ModelAttribute @Valid Photographer photographer,
+//                        BindingResult result,
+//                        RedirectAttributes redirectAttributes,
+//                        HttpSession session) {
+//        if (result.hasErrors()) {
+//            return "photographer/login";
+//        }
+//
+//        Photographer photographerLogado = service.login(photographer.getName(), photographer.getEmail());
+//
+//        if (photographerLogado == null) {
+//            redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
+//            return "redirect:/photographer/login";
+//        }
+//
+//        if (photographerLogado.isSuspended()) {
+//            redirectAttributes.addFlashAttribute("mensagem", "Sua conta está suspensa. Entre em contato com o suporte.");
+//            return "redirect:/photographer/login";
+//        }
+//
+//        session.setAttribute("photographerLogado", photographerLogado);
+//        redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
+//
+//        return "redirect:/photographer/dashboard";
+//    }
 
     @PostMapping("/logout")
     public String logout(HttpSession session) {
