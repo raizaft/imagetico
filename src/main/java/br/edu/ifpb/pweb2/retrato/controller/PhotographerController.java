@@ -3,6 +3,7 @@ package br.edu.ifpb.pweb2.retrato.controller;
 
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
+import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -32,6 +33,10 @@ public class PhotographerController {
 
     @Autowired
     private PhotographerService service;
+
+    @Autowired
+    private PhotoService servicePhoto;
+
 
     @ModelAttribute("photographerLogado")
     public Photographer getLoggedInPhotographer(HttpSession session) {
@@ -93,9 +98,6 @@ public class PhotographerController {
         session.setAttribute("photographerLogado", photographerLogado);
         redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
 
-        if (photographerLogado.isAdmin()) {
-            return "redirect:/photographer/dashboardAdm";
-        }
         return "redirect:/photographer/dashboard";
     }
 
@@ -117,30 +119,37 @@ public class PhotographerController {
         if (photographer == null || photographer.getId() == null) {
             return "redirect:/photographer/login";
         }
+        List<Photographer> followingPhotographers = new ArrayList<>();
 
         if (photographer.isAdmin()) {
-            return "redirect:/photographer/dashboardAdm";
-        }
+            List<Photographer> photographers = service.list();
+            List<Photo> allPhotos = photographers.stream()
+                    .flatMap(p -> p.getPhotos().stream())
+                    .collect(Collectors.toList());
 
-        Photographer photographerFromDB = service.findById(photographer.getId());
-        List<Photo> photos = photographerFromDB.getPhotos();
-        Collections.reverse(photos);
+            Collections.reverse(allPhotos);
+            model.addAttribute("followingPhotos", allPhotos);
+        } else {
 
-        List<Photographer> followingPhotographers = photographerFromDB.getFollowing();
-        List<Photo> followingPhotos = new ArrayList<>();
-        for (Photographer followedPhotographer : followingPhotographers) {
-            followingPhotos.addAll(followedPhotographer.getPhotos());
+            Photographer photographerFromDB = service.findById(photographer.getId());
+            List<Photo> photos = photographerFromDB.getPhotos();
+
+            followingPhotographers = photographerFromDB.getFollowing();
+            List<Photo> followingPhotos = new ArrayList<>(photos);
+            for (Photographer followedPhotographer : followingPhotographers) {
+                followingPhotos.addAll(followedPhotographer.getPhotos());
+            }
+            Collections.reverse(followingPhotos);
+            model.addAttribute("followingPhotos", followingPhotos);
         }
 
         List<Photographer> photographers = service.list();
         model.addAttribute("followingPhotographers", followingPhotographers);
-        model.addAttribute("followingPhotos", followingPhotos);
-        model.addAttribute("photos", photos);
         model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
+        model.addAttribute("isAdmin", photographer.isAdmin());
         return "photographer/dashboard";
     }
-
 
     @GetMapping("/dashboardAdm")
     public String dashboardAdmin(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
@@ -151,7 +160,7 @@ public class PhotographerController {
         List<Photographer> photographers = service.list();
         model.addAttribute("photographers", photographers);
         model.addAttribute("photographerLogado", photographer);
-
+        model.addAttribute("isAdmin", photographer.isAdmin());
         return "administrator/dashboardAdm";
     }
 

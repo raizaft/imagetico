@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -84,6 +85,10 @@ public class PhotoService {
             photo.getLikes().add(likeToAdd);
         }
         photoRepository.save(photo);
+    }
+
+    public List<Photo> listAllPhotos() {
+        return photoRepository.findAll();
     }
 
     public Photo findById(Integer id) {
