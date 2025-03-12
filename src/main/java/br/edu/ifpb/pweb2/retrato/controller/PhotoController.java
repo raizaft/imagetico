@@ -93,4 +93,5 @@ public class PhotoController {
         service.likePhoto(photographerId, photoId);
         return "redirect:/photographer/dashboard";
     }
+
 }
