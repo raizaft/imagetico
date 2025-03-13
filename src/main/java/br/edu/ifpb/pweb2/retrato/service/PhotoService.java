@@ -1,6 +1,5 @@
 package br.edu.ifpb.pweb2.retrato.service;
 
-import br.edu.ifpb.pweb2.retrato.dto.PhotoDTO;
 import br.edu.ifpb.pweb2.retrato.model.Comment;
 import br.edu.ifpb.pweb2.retrato.model.Like;
 import br.edu.ifpb.pweb2.retrato.model.Photo;

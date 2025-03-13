@@ -23,10 +23,11 @@
         <div th:if="${param.logout}" class="alert alert-success">
             Logout realizado com sucesso.
         </div>
-        <form method="post">
+        <form method="post" th:action="@{/auth/login}">
             <div class="mb-3">
                 <label for="email" class="form-label">E-mail</label>
-                <input type="text" class="form-control" id="email" name="email" placeholder="Insira seu e-mail">            </div>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Insira seu e-mail">
+            </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label">Senha</label>

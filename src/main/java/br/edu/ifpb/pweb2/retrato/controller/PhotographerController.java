@@ -5,6 +5,7 @@ import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
+import br.edu.ifpb.pweb2.retrato.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,18 +39,13 @@ public class PhotographerController {
     private PhotographerService service;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private PhotoService servicePhoto;
-
-
-    @ModelAttribute("photographerLogado")
-    public Photographer getLoggedInPhotographer(HttpSession session) {
-        return Optional.ofNullable(session.getAttribute("photographerLogado"))
-                .map(photographer -> service.findById(((Photographer) photographer).getId()))
-                .orElse(null);
-    }
 
     @GetMapping("/form")
     public ModelAndView getForm(ModelAndView modelAndView) {
@@ -57,12 +55,10 @@ public class PhotographerController {
     }
 
     @PostMapping("/register")
-    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, BindingResult result, RedirectAttributes redirectAttributes) throws IOException {
+    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, @RequestParam("password") String password, BindingResult result, RedirectAttributes redirectAttributes) throws IOException {
         if (result.hasErrors()) {
             return "photographer/form";
         }
-
-        photographer.setPassword(passwordEncoder.encode(photographer.getPassword()));
 
         MultipartFile file = photographer.getProfilePhotoFile();
         if (file != null && !file.isEmpty()) {
@@ -77,6 +73,9 @@ public class PhotographerController {
         }
 
         service.register(photographer);
+
+        userService.createUser(photographer, password);
+
         redirectAttributes.addFlashAttribute("mensagem", "Fotógrafo cadastrado com sucesso!");
         return "redirect:/photographer/login";
     }
@@ -122,39 +121,58 @@ public class PhotographerController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
+    public String dashboard(@RequestParam("photographerId") Integer photographerId, Model model) {
+        Photographer photographerHome = service.findById(photographerId);
+        if (photographerHome == null || photographerHome.getId() == null) {
+            return "redirect:/photographer/login";
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographer = service.getPhotographerByEmail(email);
         if (photographer == null || photographer.getId() == null) {
             return "redirect:/photographer/login";
         }
+
         List<Photographer> followingPhotographers = new ArrayList<>();
 
-        if (photographer.isAdmin()) {
-            List<Photographer> photographers = service.list();
-            List<Photo> allPhotos = photographers.stream()
-                    .flatMap(p -> p.getPhotos().stream())
-                    .collect(Collectors.toList());
+        Photographer photographerFromDB = service.findById(photographer.getId());
+        List<Photo> photos = photographerFromDB.getPhotos();
 
-            Collections.reverse(allPhotos);
-            model.addAttribute("followingPhotos", allPhotos);
-        } else {
-
-            Photographer photographerFromDB = service.findById(photographer.getId());
-            List<Photo> photos = photographerFromDB.getPhotos();
-
-            followingPhotographers = photographerFromDB.getFollowing();
-            List<Photo> followingPhotos = new ArrayList<>(photos);
-            for (Photographer followedPhotographer : followingPhotographers) {
-                followingPhotos.addAll(followedPhotographer.getPhotos());
-            }
-            Collections.reverse(followingPhotos);
-            model.addAttribute("followingPhotos", followingPhotos);
+        followingPhotographers = photographerFromDB.getFollowing();
+        List<Photo> followingPhotos = new ArrayList<>(photos);
+        for (Photographer followedPhotographer : followingPhotographers) {
+            followingPhotos.addAll(followedPhotographer.getPhotos());
         }
+        Collections.reverse(followingPhotos);
+        model.addAttribute("followingPhotos", followingPhotos);
+
+//        if (photographer.isAdmin()) {
+//            List<Photographer> photographers = service.list();
+//            List<Photo> allPhotos = photographers.stream()
+//                    .flatMap(p -> p.getPhotos().stream())
+//                    .collect(Collectors.toList());
+//
+//            Collections.reverse(allPhotos);
+//            model.addAttribute("followingPhotos", allPhotos);
+//        } else {
+//
+//            Photographer photographerFromDB = service.findById(photographer.getId());
+//            List<Photo> photos = photographerFromDB.getPhotos();
+//
+//            followingPhotographers = photographerFromDB.getFollowing();
+//            List<Photo> followingPhotos = new ArrayList<>(photos);
+//            for (Photographer followedPhotographer : followingPhotographers) {
+//                followingPhotos.addAll(followedPhotographer.getPhotos());
+//            }
+//            Collections.reverse(followingPhotos);
+//            model.addAttribute("followingPhotos", followingPhotos);
+//        }
 
         List<Photographer> photographers = service.list();
         model.addAttribute("followingPhotographers", followingPhotographers);
         model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
-        model.addAttribute("isAdmin", photographer.isAdmin());
         return "photographer/dashboard";
     }
 

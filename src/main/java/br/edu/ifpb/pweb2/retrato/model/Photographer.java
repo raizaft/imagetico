@@ -29,22 +29,17 @@ public class Photographer {
     @Email(message = "Por favor, forneça um email válido.")
     private String email;
 
-    @NotEmpty(message = "A senha é obrigatória.")
-    private String password;
-
-    private LocalDateTime createdAt;
-
     private String city;
     private String country;
-
-    @Transient
-    private MultipartFile profilePhotoFile;
-    private String profilePhotoPath;
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+    private LocalDateTime createdAt;
+
+    @Transient
+    private MultipartFile profilePhotoFile;
+    private String profilePhotoPath;
 
     private boolean suspended = false;
     private boolean followAllowed = true;

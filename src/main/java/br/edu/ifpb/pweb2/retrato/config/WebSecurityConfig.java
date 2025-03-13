@@ -1,16 +1,23 @@
 package br.edu.ifpb.pweb2.retrato.config;
 
+import br.edu.ifpb.pweb2.retrato.model.Photographer;
+import br.edu.ifpb.pweb2.retrato.service.PhotographerDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.sql.DataSource;
 
@@ -18,19 +25,33 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+    private final PhotographerDetailsService userDetailsService;
+
     @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    private AuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    public WebSecurityConfig(PhotographerDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
     @Bean
-    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/imagens/**", "/index", "/photographer/form", "/photographer/login").permitAll()
+                        .requestMatchers("/css/**", "/imgs/**", "/", "/photographer/register", "/photographer/form", "/login/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin((form) -> form
-                        .loginPage("/photographer/login")
-                        .defaultSuccessUrl("/photographer/dashboard", true)
+                        .loginPage("/auth/login")
+                        .usernameParameter("email")
+                        .successHandler(customAuthenticationSuccessHandler)
                         .permitAll())
-                .logout((logout) -> logout.logoutUrl("/auth/logout"));
+                .logout((logout) -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/photographer/login")
+                        .permitAll());
         return http.build();
     }
 
@@ -41,20 +62,15 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public JdbcUserDetailsManager userDetailsService() {
-        JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
-
-        manager.setUsersByUsernameQuery("SELECT email AS username, password FROM photographer WHERE email = ?");
-
-        return manager;
-    }
-
-    @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 }

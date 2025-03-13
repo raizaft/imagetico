@@ -60,6 +60,10 @@ public class PhotographerService {
         return repository.findById(id).orElse(null);
     }
 
+    public Photographer getPhotographerByEmail(String email) {
+        return repository.findByEmail(email);
+    }
+
     public void suspendComments(Integer photographerId) {
         Photographer photographer = repository.findById(photographerId).orElseThrow(() -> new RuntimeException("Fotógrafo não encontrado"));
         photographer.setCanComment(false);
