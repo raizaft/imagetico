@@ -3,9 +3,12 @@ package br.edu.ifpb.pweb2.retrato.controller;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
+import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +27,17 @@ import java.nio.file.StandardCopyOption;
 public class PhotoController {
 
     @Autowired
+    private PhotographerService photographerService;
+
+    @Autowired
     private PhotoService service;
 
     @GetMapping("/form")
-    public ModelAndView getForm(HttpSession session, RedirectAttributes redirectAttributes) {
-        Photographer photographerLogado = (Photographer) session.getAttribute("photographerLogado");
+    public ModelAndView getForm(RedirectAttributes redirectAttributes) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
 
         if (photographerLogado == null || photographerLogado.getId() == null) {
             redirectAttributes.addFlashAttribute("mensagem", "Você precisa estar logado para acessar esta página.");

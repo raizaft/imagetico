@@ -76,12 +76,6 @@ public class PhotographerService {
         repository.save(photographer);
     }
 
-
-
-
-
-
-
     public void followPhotographer(Integer followerId, Integer followedId) {
         if (followerId.equals(followedId)) {
             throw new IllegalArgumentException("Um fotógrafo não pode seguir a si mesmo.");
