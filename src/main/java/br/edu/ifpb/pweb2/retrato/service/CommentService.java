@@ -35,18 +35,18 @@ public class CommentService {
             PdfWriter.getInstance(document, baos);
             document.open();
             // Definição de fontes para formatação
-            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
-            Font subHeaderFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
-            Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 12);
+            Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 18);
+            Font subHeaderFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14);
+            Font normalFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 11);
 
             // Utiliza a foto associada ao primeiro comentário para extrair os dados
             Photo photo = comments.get(0).getPhoto();
 
             // Seção de Cabeçalho com informações da foto
             Paragraph title = new Paragraph("Detalhes da Foto", headerFont);
-            title.setAlignment(Element.ALIGN_CENTER);
+            title.setAlignment(Element.ALIGN_LEFT);
             document.add(title);
-            document.add(new Paragraph(" ")); // Linha em branco
+            document.add(new Paragraph(" "));
 
             Paragraph photoDesc = new Paragraph("Descrição: " + photo.getDescription(), normalFont);
             document.add(photoDesc);
@@ -54,21 +54,12 @@ public class CommentService {
             Paragraph photographer = new Paragraph("Fotógrafo: " + photo.getPhotographer().getName(), normalFont);
             document.add(photographer);
 
-//            // Lista as hashtags, se houver
-//            if (photo.getTags() != null && !photo.getTags().isEmpty()) {
-//                StringBuilder tagsStr = new StringBuilder();
-//                for (Hashtag tag : photo.getTags()) {
-//                    tagsStr.append("#").append(tag.getTagName()).append(" ");
-//                }
-//                Paragraph tagsParagraph = new Paragraph("Hashtags: " + tagsStr.toString(), normalFont);
-//                document.add(tagsParagraph);
-//            }
-            document.add(new Paragraph(" ")); // Linha em branco
+            document.add(new Paragraph(" "));
 
             // Seção de Comentários
             Paragraph commentSection = new Paragraph("Comentários", subHeaderFont);
             document.add(commentSection);
-            document.add(new Paragraph(" ")); // Linha em branco
+            document.add(new Paragraph(" "));
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -80,8 +71,8 @@ public class CommentService {
                 commentParagraph.add(new Chunk(comment.getCommentText() + "\n", normalFont));
                 document.add(commentParagraph);
 
-                // Linha separadora para melhor visualização
-                document.add(new Paragraph("--------------------------------------------------------------------------------", normalFont));
+                document.add(new Paragraph(" "));
+                document.add(new Paragraph(" "));
             }
 
             document.close();
