@@ -37,25 +37,25 @@
                     <td th:text="${photographer.name}"></td>
                     <td th:text="${photographer.email}"></td>
                     <td>
-                        <form th:action="@{/photographer/suspend}" method="post" class="d-inline"
+                        <form th:action="@{/administrator/suspend}" method="post" class="d-inline"
                               th:if="${!photographer.suspended}">
                             <input type="hidden" th:value="${photographer.id}" name="photographerId">
                             <button type="submit" class="btn btn-warning btn-sm">Suspender</button>
                         </form>
 
-                        <form th:action="@{/photographer/activate}" method="post" class="d-inline"
+                        <form th:action="@{/administrator/activate}" method="post" class="d-inline"
                               th:if="${photographer.suspended}">
                             <input type="hidden" th:value="${photographer.id}" name="photographerId">
                             <button type="submit" class="btn btn-success btn-sm">Ativar</button>
                         </form>
 
-                        <form th:action="@{/photographer/suspend-comments}" method="post" class="d-inline"
+                        <form th:action="@{/administrator/suspend-comments}" method="post" class="d-inline"
                               th:if="${photographer.isCanComment()}">
                             <input type="hidden" th:value="${photographer.id}" name="photographerId">
                             <button type="submit" class="btn btn-warning btn-sm">Suspender comentários</button>
                         </form>
 
-                        <form th:action="@{/photographer/allow-comments}" method="post" class="d-inline"
+                        <form th:action="@{/administrator/allow-comments}" method="post" class="d-inline"
                               th:if="${!photographer.isCanComment()}">
                             <input type="hidden" th:value="${photographer.id}" name="photographerId">
                             <button type="submit" class="btn btn-success btn-sm">Ativar comentários</button>

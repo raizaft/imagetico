@@ -38,6 +38,7 @@ public class Photo {
     @ToString.Exclude
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
+//    @JoinColumn(name = "photographer_id", referencedColumnName = "id", nullable = false)
     private Photographer photographer;
 
     public boolean isLikedByUser(Photographer photographer) {
