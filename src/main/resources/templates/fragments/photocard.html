@@ -11,7 +11,7 @@
 <div th:fragment="photocard (photo, photographerLogado)">
     <div class="photocard">
         <p style="padding: 16px; font-size: 12px; margin: 0">
-            Postado por <strong th:text="${photo.photographer.name}"></strong> em <span th:text="${photo.createdAt}"></span>
+            Postado por <strong th:text="${photo.photographer.name}"></strong> em <span th:text="${photo.getFormattedCreatedAt()}"></span>
         </p>
         <img th:src="${photo.photoPath}" class="card-img-top" alt="Foto">
         <div class="card-body" style="display: flex; flex-direction: column; gap: 16px">
@@ -54,7 +54,7 @@
                         <p class="comment-text" th:text="${comment.commentText}" style="margin: 0"></p>
                     </div>
                 </div>
-                <p class="comment-date" th:text="${comment.createdAt}" style="font-size: 12px"></p>
+                <p class="comment-date" th:text="${comment.getFormattedCreatedAt()}" style="font-size: 12px"></p>
             </div>
 <!--            &lt;!&ndash; Ações (Editar e Excluir) &ndash;&gt;-->
 <!--            <div class="comment-actions"-->

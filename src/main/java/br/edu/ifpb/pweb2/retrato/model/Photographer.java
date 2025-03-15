@@ -8,6 +8,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -36,6 +37,11 @@ public class Photographer {
         this.createdAt = LocalDateTime.now();
     }
     private LocalDateTime createdAt;
+
+    public String getFormattedCreatedAt() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss");
+        return this.createdAt.format(formatter);
+    }
 
     @Transient
     private MultipartFile profilePhotoFile;
