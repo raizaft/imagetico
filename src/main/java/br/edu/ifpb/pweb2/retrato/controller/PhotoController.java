@@ -51,12 +51,13 @@ public class PhotoController {
 
     @PostMapping("/upload")
     public String upload(
-            HttpSession session,
             @ModelAttribute @Valid Photo photo,
             BindingResult result,
             RedirectAttributes redirectAttributes) throws IOException {
 
-        Photographer photographerLogado = (Photographer) session.getAttribute("photographerLogado");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
 
         if (photographerLogado == null || photographerLogado.getId() == null) {
             redirectAttributes.addFlashAttribute("mensagem", "Você precisa estar logado para publicar uma foto.");
@@ -88,6 +89,16 @@ public class PhotoController {
                              @RequestParam("photographerId") Integer photographerId,
                              @RequestParam("photoId") Integer photoId, RedirectAttributes redirectAttributes) {
 
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
+
+        if (photographerLogado == null || photographerLogado.getId() == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Você precisa estar logado para comentar.");
+            return "redirect:/photographer/dashboard";
+        }
+
         try {
             service.addComment(photographerId, photoId, commentText);
             redirectAttributes.addFlashAttribute("mensagem", "Comentário adicionado com sucesso!");
@@ -102,5 +113,7 @@ public class PhotoController {
         service.likePhoto(photographerId, photoId);
         return "redirect:/photographer/dashboard";
     }
+
+
 
 }
