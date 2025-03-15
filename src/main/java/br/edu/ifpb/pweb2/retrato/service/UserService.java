@@ -25,7 +25,7 @@ public class UserService {
         user.setEmail(photographer.getEmail());
         user.setPassword(passwordEncoder.encode(password));
 
-        String authorityName = "USER";
+        String authorityName = photographer.isAdmin() ? "ADMIN" : "USER";
         Authority authority = authorityRepository.findByAuthority(authorityName)
                 .orElseGet(() -> authorityRepository.save(new Authority(authorityName)));
         user.getAuthorities().add(authority);

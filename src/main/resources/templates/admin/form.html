@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de fotografos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/form.css}"/>
+    <link rel="stylesheet" th:href="@{/css/header.css}"/>
+</head>
+<body>
+<div th:insert="~{fragments/fragments::header}"></div>
+<div class="box-form">
+    <div class="titles">
+        <h3>Crie uma conta imagética</h3>
+        <p class="subtitle">E compartilhe sua visão com o mundo.</p>
+    </div>
+    <div class="container">
+        <div class="containerimg">
+            <img class="logotitle" th:src="@{/imgs/logopreta.png}" alt="logo">
+        </div>
+        <div th:if="${mensagem}" th:text="${mensagem}" style="color: green;"></div>
+        <form action="#" th:action="@{/administrator/register}" th:object="${photographer}" method="post" enctype="multipart/form-data" >
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Digite seu nome">
+                <div th:if="${#fields.hasErrors('name')}" class="text-danger">
+                    <p th:errors="*{name}"></p>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">E-mail</label>
+                <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Digite seu e-mail">
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Digite sua senha" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="city" class="form-label">Cidade</label>
+                <input type="text" class="form-control" id="city" th:field="*{city}" placeholder="Digite sua cidade">
+            </div>
+
+            <div class="mb-3">
+                <label for="country" class="form-label">País</label>
+                <input type="text" class="form-control" id="country" th:field="*{country}" placeholder="Digite seu país">
+            </div>
+
+            <div class="mb-3">
+                <label for="profilePhotoFile" class="form-label">Foto de Perfil</label>
+                <input type="file" class="form-control" id="profilePhotoFile" name="profilePhotoFile" accept="image/*">
+            </div>
+            <div class="button">
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

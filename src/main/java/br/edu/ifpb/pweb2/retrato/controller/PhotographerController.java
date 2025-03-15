@@ -53,64 +53,11 @@ public class PhotographerController {
         return service.getPhotographerByEmail(email);
     }
 
-    @GetMapping("/form")
-    public ModelAndView getForm(ModelAndView modelAndView) {
-        modelAndView.setViewName("photographer/form");
-        modelAndView.addObject("photographer", new Photographer());
-        return modelAndView;
-    }
-
-    @PostMapping("/register")
-    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, @RequestParam("password") String password, BindingResult result, RedirectAttributes redirectAttributes) throws IOException {
-        if (result.hasErrors()) {
-            return "photographer/form";
-        }
-
-        MultipartFile file = photographer.getProfilePhotoFile();
-        if (file != null && !file.isEmpty()) {
-            String uploadDir = "uploads/";
-            String fileName = photographer.getEmail() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir, fileName);
-            Files.createDirectories(filePath.getParent());
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            photographer.setProfilePhotoPath("/uploads/" + fileName);
-        } else {
-            photographer.setProfilePhotoPath("/uploads/generic-user.png");
-        }
-
-        service.register(photographer);
-
-        userService.createUser(photographer, password);
-
-        redirectAttributes.addFlashAttribute("mensagem", "Fotógrafo cadastrado com sucesso!");
-        return "redirect:/photographer/login";
-    }
-
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.removeAttribute("photographerLogado");
-        session.invalidate();
-        return "redirect:/photographer/login";
-    }
-
-    @GetMapping("/login")
-    public String loginForm(Model model) {
-        model.addAttribute("photographer", new Photographer());
-        return "photographer/login";
-    }
-
     @GetMapping("/dashboard")
-    public String dashboard(@RequestParam("photographerId") Integer photographerId, Model model) {
-        // Recupera o fotógrafo da página inicial (home)
-        Photographer photographerHome = service.findById(photographerId);
-        if (photographerHome == null || photographerHome.getId() == null) {
-            return "redirect:/photographer/login";
-        }
-
-        // Recupera o fotógrafo autenticado
+    public String dashboard(Model model) {
         Photographer photographer = getAuthenticatedPhotographer();
         if (photographer == null || photographer.getId() == null) {
-            return "redirect:/photographer/login";
+            return "redirect:/auth/login";
         }
 
         // Verifica se o fotógrafo autenticado é um administrador
@@ -154,6 +101,17 @@ public class PhotographerController {
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
 
         return "photographer/dashboard";
+    }
+
+    @PostMapping("/logout")
+    public String logout() {
+        return "redirect:/auth/login";
+    }
+
+    @GetMapping("/login")
+    public String loginForm(Model model) {
+        model.addAttribute("photographer", new Photographer());
+        return "photographer/login";
     }
 
     @GetMapping("/profile")
@@ -250,31 +208,36 @@ public class PhotographerController {
         return "redirect:/photographer/profile";
     }
 
-    //    @PostMapping("/login")
-//    public String login(@ModelAttribute @Valid Photographer photographer,
-//                        BindingResult result,
-//                        RedirectAttributes redirectAttributes,
-//                        HttpSession session) {
-//        if (result.hasErrors()) {
-//            return "photographer/login";
-//        }
-//
-//        Photographer photographerLogado = service.login(photographer.getName(), photographer.getEmail());
-//
-//        if (photographerLogado == null) {
-//            redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
-//            return "redirect:/photographer/login";
-//        }
-//
-//        if (photographerLogado.isSuspended()) {
-//            redirectAttributes.addFlashAttribute("mensagem", "Sua conta está suspensa. Entre em contato com o suporte.");
-//            return "redirect:/photographer/login";
-//        }
-//
-//        session.setAttribute("photographerLogado", photographerLogado);
-//        redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
-//
-//        return "redirect:/photographer/dashboard";
-//    }
+    @GetMapping("/form")
+    public ModelAndView getForm(ModelAndView modelAndView) {
+        modelAndView.setViewName("photographer/form");
+        modelAndView.addObject("photographer", new Photographer());
+        return modelAndView;
+    }
+
+    @PostMapping("/register")
+    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, @RequestParam("password") String password, BindingResult result, RedirectAttributes redirectAttributes) throws IOException {
+        if (result.hasErrors()) {
+            return "photographer/form";
+        }
+
+        MultipartFile file = photographer.getProfilePhotoFile();
+        if (file != null && !file.isEmpty()) {
+            String uploadDir = "uploads/";
+            String fileName = photographer.getEmail() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir, fileName);
+            Files.createDirectories(filePath.getParent());
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            photographer.setProfilePhotoPath("/uploads/" + fileName);
+        } else {
+            photographer.setProfilePhotoPath("/uploads/generic-user.png");
+        }
+
+        service.register(photographer);
+        userService.createUser(photographer, password);
+
+        redirectAttributes.addFlashAttribute("mensagem", "Fotógrafo cadastrado com sucesso!");
+        return "redirect:/photographer/login";
+    }
 
 }
