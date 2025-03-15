@@ -1,6 +1,5 @@
 package br.edu.ifpb.pweb2.retrato.service;
 
-import br.edu.ifpb.pweb2.retrato.dto.PhotoDTO;
 import br.edu.ifpb.pweb2.retrato.model.Comment;
 import br.edu.ifpb.pweb2.retrato.model.Like;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,6 +50,11 @@ public class PhotoService {
     public void addComment(Integer photographerId, Integer photoId, String comment) {
         Photo photo = photoRepository.findById(photoId).orElseThrow();
         Photographer photographer = photographerRepository.findById(photographerId).orElseThrow();
+
+        if (!photographer.isCanComment() && !photo.getPhotographer().getId().equals(photographerId)) {
+            throw new RuntimeException("Você está suspenso de comentar em fotos de terceiros.");
+        }
+
         Comment commentToAdd = Comment.builder()
                 .commentText(comment)
                 .photographer(photographer)
@@ -79,6 +84,10 @@ public class PhotoService {
             photo.getLikes().add(likeToAdd);
         }
         photoRepository.save(photo);
+    }
+
+    public List<Photo> listAllPhotos() {
+        return photoRepository.findAll();
     }
 
     public Photo findById(Integer id) {

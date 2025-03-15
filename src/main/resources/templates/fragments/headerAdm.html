@@ -8,16 +8,20 @@
 </head>
 <body>
 <div th:fragment="headerAdm" class="navbar">
-  <a th:href="@{/administrator/dashboardAdm}"><img class="logo" th:src="@{/imgs/logo2.png}" alt="logo"></a>
+  <a th:href="@{/photographer/dashboardAdm}"><img class="logo" th:src="@{/imgs/logo2.png}" alt="logo"></a>
   <div class="menu">
-    <a th:href="@{/administrator/dashboardAdm}" title="Perfil">
+    <a th:href="@{/photographer/dashboardAdm}" title="Perfil">
       <i class="bi bi-person"></i>
+    </a>
+
+    <a th:href="@{/photographer/dashboard}" title="Acesso ao Imagetico">
+      <i class="bi bi-camera"></i>
     </a>
 
     <a href="#" onclick="document.getElementById('logout-form').submit();">
       <i class="bi bi-box-arrow-right"></i>
     </a>
-    <form id="logout-form" action="/administrator/logout" method="post" style="display:none;"></form>
+    <form id="logout-form" action="/photographer/logout" method="post" style="display:none;"></form>
   </div>
 </div>
 </body>

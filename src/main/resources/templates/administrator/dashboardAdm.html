@@ -14,7 +14,7 @@
 <div th:insert="fragments/headerAdm :: headerAdm"></div>
 <div class="container mt-5" style="margin-left: auto; margin-right: auto">
     <header class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Bem-vindo(a), <span th:text="${admLogado.name}"></span></h1>
+        <h1>Bem-vindo(a), <span th:text="${photographerLogado.name}"></span></h1>
     </header>
 
     <div class="card ">
@@ -37,16 +37,28 @@
                     <td th:text="${photographer.name}"></td>
                     <td th:text="${photographer.email}"></td>
                     <td>
-                        <form th:action="@{/administrator/suspend}" method="post" class="d-inline"
+                        <form th:action="@{/photographer/suspend}" method="post" class="d-inline"
                               th:if="${!photographer.suspended}">
                             <input type="hidden" th:value="${photographer.id}" name="photographerId">
                             <button type="submit" class="btn btn-warning btn-sm">Suspender</button>
                         </form>
 
-                        <form th:action="@{/administrator/activate}" method="post" class="d-inline"
+                        <form th:action="@{/photographer/activate}" method="post" class="d-inline"
                               th:if="${photographer.suspended}">
                             <input type="hidden" th:value="${photographer.id}" name="photographerId">
                             <button type="submit" class="btn btn-success btn-sm">Ativar</button>
+                        </form>
+
+                        <form th:action="@{/photographer/suspend-comments}" method="post" class="d-inline"
+                              th:if="${photographer.isCanComment()}">
+                            <input type="hidden" th:value="${photographer.id}" name="photographerId">
+                            <button type="submit" class="btn btn-warning btn-sm">Suspender comentários</button>
+                        </form>
+
+                        <form th:action="@{/photographer/allow-comments}" method="post" class="d-inline"
+                              th:if="${!photographer.isCanComment()}">
+                            <input type="hidden" th:value="${photographer.id}" name="photographerId">
+                            <button type="submit" class="btn btn-success btn-sm">Ativar comentários</button>
                         </form>
                     </td>
                 </tr>

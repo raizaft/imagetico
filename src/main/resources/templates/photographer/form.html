@@ -31,9 +31,11 @@
             <div class="mb-3">
                 <label for="email" class="form-label">E-mail</label>
                 <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Digite seu e-mail">
-                <div th:if="${#fields.hasErrors('email')}" class="text-danger">
-                    <p th:errors="*{email}">E-mail inválido</p>
-                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Digite sua senha" required>
             </div>
 
             <div class="mb-3">

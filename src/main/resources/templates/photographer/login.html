@@ -17,21 +17,21 @@
         <p class="subtitle">E comece a compartilhar suas criações</p>
     </div>
     <div class="container">
-        <form th:action="@{/photographer/login}" th:object="${photographer}" method="post">
+        <div th:if="${param.error}" class="alert alert-danger">
+            Usuário ou senha inválidos.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success">
+            Logout realizado com sucesso.
+        </div>
+        <form method="post" th:action="@{/auth/login}">
             <div class="mb-3">
-                <label for="name" class="form-label">Nome</label>
-                <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Digite seu nome">
-                <div th:if="${#fields.hasErrors('name')}" class="text-danger">
-                    <p th:errors="*{name}"></p>
-                </div>
+                <label for="email" class="form-label">E-mail</label>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Insira seu e-mail">
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Digite seu e-mail">
-                <div th:if="${#fields.hasErrors('email')}" class="text-danger">
-                    <p th:errors="*{email}"></p>
-                </div>
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Insira sua senha">
             </div>
             <button type="submit" class="btn btn-primary">Entrar</button>
         </form>

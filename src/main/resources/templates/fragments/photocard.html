@@ -56,8 +56,49 @@
                 </div>
                 <p class="comment-date" th:text="${comment.createdAt}" style="font-size: 12px"></p>
             </div>
+            <!-- Ações (Editar e Excluir) -->
+            <div class="comment-actions"
+                 th:if="${photographerLogado != null && (photographerLogado.id == comment.photographer.id || photographerLogado.isAdmin)}"
+                 style="display: flex; gap: 8px;">
+
+                <!-- Ícone Editar -->
+                <form th:action="@{/photo/editComment}" method="post" style="display: inline;">
+                    <input type="hidden" name="commentId" th:value="${comment.id}" />
+                    <input type="hidden" name="updatedText" id="updatedTextInput" />
+                    <button type="button" class="btn btn-light btn-sm" onclick="editComment(this, '${comment.id}')">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </form>
+
+                <!-- Ícone Excluir -->
+                <form th:action="@{/photo/deleteComment}" method="post" onsubmit="return confirm('Tem certeza que deseja excluir este comentário?');">
+                    <input type="hidden" name="commentId" th:value="${comment.id}" />
+                    <button type="submit" class="btn btn-light btn-sm">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+            <div th:block th:if="${photographerLogado != null and photographerLogado.isAdmin and #lists.size(photo.comments) > 0}">
+                <form th:action="@{/pdf}" method="get">
+                    <input type="hidden" name="photo_id" th:value="${photo.id}">
+                    <button type="submit"
+                            id="b2" class="teste">
+                        Baixar
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 </body>
+<script>
+    function editComment(button, commentId) {
+        let newText = prompt("Edite seu comentário:");
+        if (newText) {
+            let form = button.closest("form");
+            form.querySelector("#updatedTextInput").value = newText;
+            form.submit();
+        }
+    }
+</script>
 </html>

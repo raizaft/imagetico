@@ -3,12 +3,13 @@ package br.edu.ifpb.pweb2.retrato.controller;
 
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
+import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
+import br.edu.ifpb.pweb2.retrato.service.UserService;
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,15 +34,18 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/photographer")
 public class PhotographerController {
+
     @Autowired
     private PhotographerService service;
 
-    @ModelAttribute("photographerLogado")
-    public Photographer getLoggedInPhotographer(HttpSession session) {
-        return Optional.ofNullable(session.getAttribute("photographerLogado"))
-                .map(photographer -> service.findById(((Photographer) photographer).getId()))
-                .orElse(null);
-    }
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PhotoService servicePhoto;
 
     @GetMapping("/form")
     public ModelAndView getForm(ModelAndView modelAndView) {
@@ -49,10 +55,11 @@ public class PhotographerController {
     }
 
     @PostMapping("/register")
-    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, BindingResult result, RedirectAttributes redirectAttributes) throws IOException {
+    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, @RequestParam("password") String password, BindingResult result, RedirectAttributes redirectAttributes) throws IOException {
         if (result.hasErrors()) {
             return "photographer/form";
         }
+
         MultipartFile file = photographer.getProfilePhotoFile();
         if (file != null && !file.isEmpty()) {
             String uploadDir = "uploads/";
@@ -66,35 +73,39 @@ public class PhotographerController {
         }
 
         service.register(photographer);
+
+        userService.createUser(photographer, password);
+
         redirectAttributes.addFlashAttribute("mensagem", "Fotógrafo cadastrado com sucesso!");
         return "redirect:/photographer/login";
     }
 
-    @PostMapping("/login")
-    public String login(@ModelAttribute @Valid Photographer photographer,
-                        BindingResult result,
-                        RedirectAttributes redirectAttributes,
-                        HttpSession session) {
-        if (result.hasErrors()) {
-            return "photographer/login";
-        }
-
-        Photographer photographerLogado = service.login(photographer.getName(), photographer.getEmail());
-
-        if (photographerLogado == null) {
-            redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
-            return "redirect:/photographer/login";
-        }
-
-        if (photographerLogado.isSuspended()) {
-            redirectAttributes.addFlashAttribute("mensagem", "Sua conta está suspensa. Entre em contato com o suporte.");
-            return "redirect:/photographer/login";
-        }
-
-        session.setAttribute("photographerLogado", photographerLogado);
-        redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
-        return "redirect:/photographer/dashboard";
-    }
+//    @PostMapping("/login")
+//    public String login(@ModelAttribute @Valid Photographer photographer,
+//                        BindingResult result,
+//                        RedirectAttributes redirectAttributes,
+//                        HttpSession session) {
+//        if (result.hasErrors()) {
+//            return "photographer/login";
+//        }
+//
+//        Photographer photographerLogado = service.login(photographer.getName(), photographer.getEmail());
+//
+//        if (photographerLogado == null) {
+//            redirectAttributes.addFlashAttribute("mensagem", "Nome ou e-mail inválidos.");
+//            return "redirect:/photographer/login";
+//        }
+//
+//        if (photographerLogado.isSuspended()) {
+//            redirectAttributes.addFlashAttribute("mensagem", "Sua conta está suspensa. Entre em contato com o suporte.");
+//            return "redirect:/photographer/login";
+//        }
+//
+//        session.setAttribute("photographerLogado", photographerLogado);
+//        redirectAttributes.addFlashAttribute("mensagem", "Usuário logado com sucesso!");
+//
+//        return "redirect:/photographer/dashboard";
+//    }
 
     @PostMapping("/logout")
     public String logout(HttpSession session) {
@@ -110,29 +121,104 @@ public class PhotographerController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
+    public String dashboard(@RequestParam("photographerId") Integer photographerId, Model model) {
+        Photographer photographerHome = service.findById(photographerId);
+        if (photographerHome == null || photographerHome.getId() == null) {
+            return "redirect:/photographer/login";
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographer = service.getPhotographerByEmail(email);
         if (photographer == null || photographer.getId() == null) {
             return "redirect:/photographer/login";
         }
 
+        List<Photographer> followingPhotographers = new ArrayList<>();
+
         Photographer photographerFromDB = service.findById(photographer.getId());
         List<Photo> photos = photographerFromDB.getPhotos();
-        Collections.reverse(photos);
 
-        List<Photographer> followingPhotographers = photographerFromDB.getFollowing();
-        List<Photo> followingPhotos = new ArrayList<>();
+        followingPhotographers = photographerFromDB.getFollowing();
+        List<Photo> followingPhotos = new ArrayList<>(photos);
         for (Photographer followedPhotographer : followingPhotographers) {
             followingPhotos.addAll(followedPhotographer.getPhotos());
         }
+        Collections.reverse(followingPhotos);
+        model.addAttribute("followingPhotos", followingPhotos);
+
+//        if (photographer.isAdmin()) {
+//            List<Photographer> photographers = service.list();
+//            List<Photo> allPhotos = photographers.stream()
+//                    .flatMap(p -> p.getPhotos().stream())
+//                    .collect(Collectors.toList());
+//
+//            Collections.reverse(allPhotos);
+//            model.addAttribute("followingPhotos", allPhotos);
+//        } else {
+//
+//            Photographer photographerFromDB = service.findById(photographer.getId());
+//            List<Photo> photos = photographerFromDB.getPhotos();
+//
+//            followingPhotographers = photographerFromDB.getFollowing();
+//            List<Photo> followingPhotos = new ArrayList<>(photos);
+//            for (Photographer followedPhotographer : followingPhotographers) {
+//                followingPhotos.addAll(followedPhotographer.getPhotos());
+//            }
+//            Collections.reverse(followingPhotos);
+//            model.addAttribute("followingPhotos", followingPhotos);
+//        }
 
         List<Photographer> photographers = service.list();
         model.addAttribute("followingPhotographers", followingPhotographers);
-        model.addAttribute("followingPhotos", followingPhotos);
-        model.addAttribute("photos", photos);
         model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
         return "photographer/dashboard";
     }
+
+    @GetMapping("/dashboardAdm")
+    public String dashboardAdmin(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
+        if (photographer == null || photographer.getId() == null || !photographer.isAdmin()) {
+            return "redirect:/photographer/login";
+        }
+
+        List<Photographer> photographers = service.list();
+        model.addAttribute("photographers", photographers);
+        model.addAttribute("photographerLogado", photographer);
+        model.addAttribute("isAdmin", photographer.isAdmin());
+        return "administrator/dashboardAdm";
+    }
+
+    @PostMapping("/suspend")
+    public String suspendPhotographer(@RequestParam Integer photographerId, @ModelAttribute("photographerLogado") Photographer admin) {
+        if (admin == null || !admin.isAdmin()) {
+            return "redirect:/photographer/login";
+        }
+        service.suspendPhotographer(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
+    @PostMapping("/activate")
+    public String activatePhotographer(@RequestParam Integer photographerId, @ModelAttribute("photographerLogado") Photographer admin) {
+        if (admin == null || !admin.isAdmin()) {
+            return "redirect:/photographer/login";
+        }
+        service.activatePhotographer(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
+    @PostMapping("/suspend-comments")
+    public String suspendComments(@RequestParam Integer photographerId) {
+       service.suspendComments(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
+    @PostMapping("/allow-comments")
+    public String allowComments(@RequestParam Integer photographerId) {
+        service.allowComments(photographerId);
+        return "redirect:/photographer/dashboardAdm";
+    }
+
 
     @GetMapping("/profile")
     public String profile(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
