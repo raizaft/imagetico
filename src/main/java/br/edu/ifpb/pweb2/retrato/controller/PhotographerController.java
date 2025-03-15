@@ -47,6 +47,12 @@ public class PhotographerController {
     @Autowired
     private PhotoService servicePhoto;
 
+    private Photographer getAuthenticatedPhotographer() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        return service.getPhotographerByEmail(email);
+    }
+
     @GetMapping("/form")
     public ModelAndView getForm(ModelAndView modelAndView) {
         modelAndView.setViewName("photographer/form");
@@ -80,7 +86,171 @@ public class PhotographerController {
         return "redirect:/photographer/login";
     }
 
-//    @PostMapping("/login")
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("photographerLogado");
+        session.invalidate();
+        return "redirect:/photographer/login";
+    }
+
+    @GetMapping("/login")
+    public String loginForm(Model model) {
+        model.addAttribute("photographer", new Photographer());
+        return "photographer/login";
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard(@RequestParam("photographerId") Integer photographerId, Model model) {
+        // Recupera o fotógrafo da página inicial (home)
+        Photographer photographerHome = service.findById(photographerId);
+        if (photographerHome == null || photographerHome.getId() == null) {
+            return "redirect:/photographer/login";
+        }
+
+        // Recupera o fotógrafo autenticado
+        Photographer photographer = getAuthenticatedPhotographer();
+        if (photographer == null || photographer.getId() == null) {
+            return "redirect:/photographer/login";
+        }
+
+        // Verifica se o fotógrafo autenticado é um administrador
+        boolean isAdmin = photographer.isAdmin();
+        model.addAttribute("isAdmin", isAdmin);
+
+        if (isAdmin) {
+            // Caso seja administrador, pega todas as fotos de todos os fotógrafos
+            List<Photographer> photographers = service.list();
+            List<Photo> allPhotos = photographers.stream()
+                    .flatMap(p -> p.getPhotos().stream())
+                    .collect(Collectors.toList());
+            Collections.reverse(allPhotos);  // Reverte a ordem das fotos
+            model.addAttribute("followingPhotos", allPhotos);
+        } else {
+            // Caso não seja administrador, pega as fotos dos fotógrafos seguidos
+            Photographer photographerFromDB = service.findById(photographer.getId());
+            List<Photo> photos = photographerFromDB.getPhotos();
+            List<Photographer> followingPhotographers = photographerFromDB.getFollowing();
+            List<Photo> followingPhotos = new ArrayList<>(photos);
+
+            // Adiciona as fotos dos fotógrafos seguidos
+            for (Photographer followedPhotographer : followingPhotographers) {
+                followingPhotos.addAll(followedPhotographer.getPhotos());
+            }
+
+            Collections.reverse(followingPhotos);  // Reverte a ordem das fotos
+            model.addAttribute("followingPhotos", followingPhotos);
+
+            // Lista os fotógrafos que o fotógrafo autenticado segue
+            model.addAttribute("followingPhotographers", followingPhotographers);
+        }
+
+        // Lista todos os fotógrafos, excluindo o fotógrafo logado
+        List<Photographer> photographers = service.list();
+        model.addAttribute("photographers", photographers.stream()
+                .filter(p -> !p.getId().equals(photographer.getId()))
+                .collect(Collectors.toList()));
+
+        // Adiciona o fotógrafo logado ao modelo
+        model.addAttribute("photographerLogado", service.findById(photographer.getId()));
+
+        return "photographer/dashboard";
+    }
+
+    @GetMapping("/profile")
+    public String profile( Model model) {
+        Photographer photographer = getAuthenticatedPhotographer();
+        if (photographer == null || photographer.getId() == null) {
+            return "redirect:/photographer/login";
+        }
+
+        Photographer photographerFromDB = service.findById(photographer.getId());
+        List<Photo> photos = photographerFromDB.getPhotos();
+        Collections.reverse(photos);
+
+        List<Photographer> following = service.findById(photographer.getId()).getFollowing();
+
+        model.addAttribute("photographerLogado", photographer);
+        model.addAttribute("following", following);
+        model.addAttribute("photos", photos);
+        return "photographer/profile";
+    }
+
+
+    @PostMapping("/follow/{followedId}")
+    public String followPhotographer(@PathVariable("followedId") Integer followedId,
+                                     RedirectAttributes redirectAttributes,
+                                     Model model) {
+
+        Photographer photographerLogado = getAuthenticatedPhotographer();
+        if (photographerLogado == null) {
+            return "redirect:/photographer/login";
+        }
+
+        try {
+            Photographer followedPhotographer = service.findById(followedId);
+
+            if (photographerLogado.getFollowing().contains(followedPhotographer)) {
+                photographerLogado.getFollowing().remove(followedPhotographer);
+                redirectAttributes.addFlashAttribute("mensagem", "Você deixou de seguir o fotógrafo!");
+            } else {
+                photographerLogado.getFollowing().add(followedPhotographer);
+                redirectAttributes.addFlashAttribute("mensagem", "Você começou a seguir o fotógrafo!");
+            }
+            service.save(photographerLogado);
+            model.addAttribute("isFollowing", isFollowing(photographerLogado, followedPhotographer));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao tentar seguir/deixar de seguir o fotógrafo: " + e.getMessage());
+        }
+        return "redirect:/photographer/{followedId}/view";
+    }
+
+    @GetMapping("/{photographerId}/view")
+    public String viewPhotographer(@PathVariable("photographerId") Integer id, Model model) {
+        Photographer photographerLogado = getAuthenticatedPhotographer();
+        if (photographerLogado == null) {
+            return "redirect:/photographer/login";
+        }
+
+        Photographer photographer = service.findById(id);
+        List<Photo> photos = photographer.getPhotos();
+        Collections.reverse(photos);
+
+        model.addAttribute("photos", photos);
+        model.addAttribute("photographer", photographer);
+        model.addAttribute("isFollowing", isFollowing(photographerLogado, photographer));
+        return "photographer/view";
+    }
+
+    private static boolean isFollowing(Photographer photographerLogado, Photographer photographer) {
+        return photographerLogado.getFollowing().stream().anyMatch(follower -> follower.getId().equals(photographer.getId()));
+    }
+
+    @GetMapping("/{photographerId}/following")
+    public String following(@PathVariable("photographerId") Integer id, Model model) {
+        Photographer photographerLogado = getAuthenticatedPhotographer();
+        if (photographerLogado == null) {
+            return "redirect:/photographer/login";
+        }
+        Photographer photographer = service.findById(id);
+        List<Photographer> following = photographer.getFollowing();
+        model.addAttribute("photographer", photographer);
+        model.addAttribute("following", following);
+        return "photographer/following";
+    }
+
+    @PostMapping("/allow-followers/{allow}")
+    public String allowFollower(@PathVariable boolean allow){
+        Photographer photographerLogado = getAuthenticatedPhotographer();
+        if (photographerLogado == null) {
+            return "redirect:/photographer/login";
+        }
+
+        photographerLogado.setFollowAllowed(allow);
+        service.save(photographerLogado);
+        return "redirect:/photographer/profile";
+    }
+
+    //    @PostMapping("/login")
 //    public String login(@ModelAttribute @Valid Photographer photographer,
 //                        BindingResult result,
 //                        RedirectAttributes redirectAttributes,
@@ -106,196 +276,5 @@ public class PhotographerController {
 //
 //        return "redirect:/photographer/dashboard";
 //    }
-
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.removeAttribute("photographerLogado");
-        session.invalidate();
-        return "redirect:/photographer/login";
-    }
-
-    @GetMapping("/login")
-    public String loginForm(Model model) {
-        model.addAttribute("photographer", new Photographer());
-        return "photographer/login";
-    }
-
-    @GetMapping("/dashboard")
-    public String dashboard(@RequestParam("photographerId") Integer photographerId, Model model) {
-        Photographer photographerHome = service.findById(photographerId);
-        if (photographerHome == null || photographerHome.getId() == null) {
-            return "redirect:/photographer/login";
-        }
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        Photographer photographer = service.getPhotographerByEmail(email);
-        if (photographer == null || photographer.getId() == null) {
-            return "redirect:/photographer/login";
-        }
-
-        List<Photographer> followingPhotographers = new ArrayList<>();
-
-        Photographer photographerFromDB = service.findById(photographer.getId());
-        List<Photo> photos = photographerFromDB.getPhotos();
-
-        followingPhotographers = photographerFromDB.getFollowing();
-        List<Photo> followingPhotos = new ArrayList<>(photos);
-        for (Photographer followedPhotographer : followingPhotographers) {
-            followingPhotos.addAll(followedPhotographer.getPhotos());
-        }
-        Collections.reverse(followingPhotos);
-        model.addAttribute("followingPhotos", followingPhotos);
-
-//        if (photographer.isAdmin()) {
-//            List<Photographer> photographers = service.list();
-//            List<Photo> allPhotos = photographers.stream()
-//                    .flatMap(p -> p.getPhotos().stream())
-//                    .collect(Collectors.toList());
-//
-//            Collections.reverse(allPhotos);
-//            model.addAttribute("followingPhotos", allPhotos);
-//        } else {
-//
-//            Photographer photographerFromDB = service.findById(photographer.getId());
-//            List<Photo> photos = photographerFromDB.getPhotos();
-//
-//            followingPhotographers = photographerFromDB.getFollowing();
-//            List<Photo> followingPhotos = new ArrayList<>(photos);
-//            for (Photographer followedPhotographer : followingPhotographers) {
-//                followingPhotos.addAll(followedPhotographer.getPhotos());
-//            }
-//            Collections.reverse(followingPhotos);
-//            model.addAttribute("followingPhotos", followingPhotos);
-//        }
-
-        List<Photographer> photographers = service.list();
-        model.addAttribute("followingPhotographers", followingPhotographers);
-        model.addAttribute("photographers", photographers.stream().filter(p -> !p.getId().equals(photographer.getId())).collect(Collectors.toList()));
-        model.addAttribute("photographerLogado", service.findById(photographer.getId()));
-        return "photographer/dashboard";
-    }
-
-    @GetMapping("/dashboardAdm")
-    public String dashboardAdmin(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
-        if (photographer == null || photographer.getId() == null || !photographer.isAdmin()) {
-            return "redirect:/photographer/login";
-        }
-
-        List<Photographer> photographers = service.list();
-        model.addAttribute("photographers", photographers);
-        model.addAttribute("photographerLogado", photographer);
-        model.addAttribute("isAdmin", photographer.isAdmin());
-        return "administrator/dashboardAdm";
-    }
-
-    @PostMapping("/suspend")
-    public String suspendPhotographer(@RequestParam Integer photographerId, @ModelAttribute("photographerLogado") Photographer admin) {
-        if (admin == null || !admin.isAdmin()) {
-            return "redirect:/photographer/login";
-        }
-        service.suspendPhotographer(photographerId);
-        return "redirect:/photographer/dashboardAdm";
-    }
-
-    @PostMapping("/activate")
-    public String activatePhotographer(@RequestParam Integer photographerId, @ModelAttribute("photographerLogado") Photographer admin) {
-        if (admin == null || !admin.isAdmin()) {
-            return "redirect:/photographer/login";
-        }
-        service.activatePhotographer(photographerId);
-        return "redirect:/photographer/dashboardAdm";
-    }
-
-    @PostMapping("/suspend-comments")
-    public String suspendComments(@RequestParam Integer photographerId) {
-       service.suspendComments(photographerId);
-        return "redirect:/photographer/dashboardAdm";
-    }
-
-    @PostMapping("/allow-comments")
-    public String allowComments(@RequestParam Integer photographerId) {
-        service.allowComments(photographerId);
-        return "redirect:/photographer/dashboardAdm";
-    }
-
-
-    @GetMapping("/profile")
-    public String profile(@ModelAttribute("photographerLogado") Photographer photographer, Model model) {
-        if (photographer == null || photographer.getId() == null) {
-            return "redirect:/photographer/login";
-        }
-
-        Photographer photographerFromDB = service.findById(photographer.getId());
-        List<Photo> photos = photographerFromDB.getPhotos();
-        Collections.reverse(photos);
-
-        List<Photographer> following = service.findById(photographer.getId()).getFollowing();
-
-        model.addAttribute("photographerLogado", photographer);
-        model.addAttribute("following", following);
-        model.addAttribute("photos", photos);
-        return "photographer/profile";
-    }
-
-
-    @PostMapping("/follow/{followedId}")
-    public String followPhotographer(@PathVariable("followedId") Integer followedId,
-                                     @ModelAttribute("photographerLogado") Photographer photographerLogado,
-                                     RedirectAttributes redirectAttributes,
-                                     Model model) {
-        try {
-            Photographer followedPhotographer = service.findById(followedId);
-
-            if (photographerLogado.getFollowing().contains(followedPhotographer)) {
-                photographerLogado.getFollowing().remove(followedPhotographer);
-                redirectAttributes.addFlashAttribute("mensagem", "Você deixou de seguir o fotógrafo!");
-            } else {
-                photographerLogado.getFollowing().add(followedPhotographer);
-                redirectAttributes.addFlashAttribute("mensagem", "Você começou a seguir o fotógrafo!");
-            }
-            service.save(photographerLogado);
-            model.addAttribute("isFollowing", isFollowing(photographerLogado, followedPhotographer));
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao tentar seguir/deixar de seguir o fotógrafo: " + e.getMessage());
-        }
-        return "redirect:/photographer/{followedId}/view";
-    }
-
-    @GetMapping("/{photographerId}/view")
-    public String viewPhotographer(@PathVariable("photographerId") Integer id,
-                                   @ModelAttribute("photographerLogado") Photographer photographerLogado, Model model) {
-        Photographer photographer = service.findById(id);
-
-        List<Photo> photos = photographer.getPhotos();
-        Collections.reverse(photos);
-
-        model.addAttribute("photos", photos);
-        model.addAttribute("photographer", photographer);
-        model.addAttribute("isFollowing", isFollowing(photographerLogado, photographer));
-        return "photographer/view";
-    }
-
-    private static boolean isFollowing(Photographer photographerLogado, Photographer photographer) {
-        return photographerLogado.getFollowing().stream().anyMatch(follower -> follower.getId().equals(photographer.getId()));
-    }
-
-    @GetMapping("/{photographerId}/following")
-    public String following(@PathVariable("photographerId") Integer id,
-                            @ModelAttribute("photographerLogado") Photographer photographerLogado, Model model) {
-        Photographer photographer = service.findById(id);
-        List<Photographer> following = photographer.getFollowing();
-        model.addAttribute("photographer", photographer);
-        model.addAttribute("following", following);
-        return "photographer/following";
-    }
-
-    @PostMapping("/allow-followers/{allow}")
-    public String allowFollower(@ModelAttribute("photographerLogado") Photographer photographerLogado,
-                                @PathVariable boolean allow){
-        photographerLogado.setFollowAllowed(allow);
-        service.save(photographerLogado);
-        return "redirect:/photographer/profile";
-    }
 
 }
