@@ -6,7 +6,6 @@ import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import br.edu.ifpb.pweb2.retrato.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +27,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
