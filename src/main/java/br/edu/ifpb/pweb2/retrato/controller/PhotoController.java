@@ -7,6 +7,8 @@ import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/photo")
@@ -109,11 +113,24 @@ public class PhotoController {
     }
 
     @PostMapping("/likePhoto")
-    public String likePhoto(@RequestParam Integer photographerId, @RequestParam Integer photoId, RedirectAttributes redirectAttributes) {
-        service.likePhoto(photographerId, photoId);
-        return "redirect:/photographer/dashboard";
+    @ResponseBody
+    public ResponseEntity<?> likePhoto(@RequestBody Map<String, Integer> payload) {
+        Integer photographerId = payload.get("photographerId");
+        Integer photoId = payload.get("photoId");
+
+        try {
+            service.likePhoto(photographerId, photoId);
+
+            Photo photo = service.getPhotoById(photoId);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "likesCount", photo.getLikes().size()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "error", e.getMessage()
+            ));
+        }
     }
-
-
-
 }

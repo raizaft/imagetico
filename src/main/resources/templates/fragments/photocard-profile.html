@@ -11,7 +11,7 @@
 <div th:fragment="photocard-profile (photo)">
     <div class="photocard">
         <p style="padding: 16px; font-size: 12px; margin: 0">
-            Postado por <strong th:text="${photo.photographer.name}"></strong> em <span th:text="${photo.createdAt}"></span>
+            Postado por <strong th:text="${photo.photographer.name}"></strong> em <span th:text="${photo.getFormattedCreatedAt()}"></span>
         </p>
         <img th:src="${photo.photoPath}" class="card-img-top" alt="Foto">
         <div class="card-body">

@@ -40,17 +40,23 @@ public class WebSecurityConfig {
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/imgs/**", "/", "/photographer/register", "/photographer/form", "/login/**", "/photographer/logout").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/css/**", "/imgs/**", "/", "/photographer/register", "/photographer/form", "/login/**", "/photographer/logout", "/administrator/register", "/administrator/form").permitAll()
+                        .requestMatchers("/administrator/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin((form) -> form
                         .loginPage("/auth/login")
                         .usernameParameter("email")
                         .successHandler(customAuthenticationSuccessHandler)
                         .permitAll())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1)
+                        .expiredUrl("/auth/login?expired=true"))
                 .logout((logout) -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/photographer/login")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll());
         return http.build();
     }

@@ -1,19 +1,11 @@
 package br.edu.ifpb.pweb2.retrato.service;
 
-import br.edu.ifpb.pweb2.retrato.model.Comment;
-import br.edu.ifpb.pweb2.retrato.model.Like;
-import br.edu.ifpb.pweb2.retrato.model.Photo;
-import br.edu.ifpb.pweb2.retrato.model.Photographer;
-import br.edu.ifpb.pweb2.retrato.repository.CommentRepository;
-import br.edu.ifpb.pweb2.retrato.repository.LikeRepository;
-import br.edu.ifpb.pweb2.retrato.repository.PhotoRepository;
-import br.edu.ifpb.pweb2.retrato.repository.PhotographerRepository;
+import br.edu.ifpb.pweb2.retrato.model.*;
+import br.edu.ifpb.pweb2.retrato.repository.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PhotoService {
@@ -28,6 +20,9 @@ public class PhotoService {
 
     @Autowired
     private LikeRepository likeRepository;
+
+    @Autowired
+    private HashtagRepository hashtagRepository;
 
     public Photo publish(Photo photo) {
         if (photo.getPhotographer() == null || photo.getPhotographer().getId() == null) {
@@ -86,11 +81,30 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
+    public void addHashtag(Photo photo, Hashtag hashtag) {
+        photo.getHashtags().add(hashtag);
+        photoRepository.save(photo);
+    }
+
+    public void removeHashtag(Photo photo, Hashtag hashtag) {
+        photo.getHashtags().remove(hashtag);
+        photoRepository.save(photo);
+    }
+
+    public int getLikesCount(Integer photoId) {
+        Photo photo = photoRepository.findById(photoId).orElseThrow(() -> new RuntimeException("Photo not found"));
+        return photo.getLikes().size();
+    }
+
     public List<Photo> listAllPhotos() {
         return photoRepository.findAll();
     }
 
     public Photo findById(Integer id) {
         return photoRepository.findById(id).orElse(null);
+    }
+
+    public Photo getPhotoById(Integer photoId) {
+        return photoRepository.findById(photoId).orElseThrow(() -> new RuntimeException("Foto não encontrada."));
     }
 }
