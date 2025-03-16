@@ -29,52 +29,71 @@ const likePhoto = (photoId, photographerId) => {
         });
 };
 
-// Função para editar o comentário
-const editComment = (commentId, commentText) => {
+// Função para exibir as sugestões de hashtags
+function showHashtagSuggestions(input) {
+    const inputValue = input.value.trim();
+    const suggestionsList = document.getElementById('hashtag-suggestions');
+
+    if (inputValue === '') {
+        suggestionsList.style.display = 'none';
+        return;
+    }
+
+    fetch(`/hashtag/search?hashtagText=${inputValue}`)
+        .then(response => response.json())
+        .then(suggestions => {
+            suggestionsList.innerHTML = ''; // Limpa as sugestões anteriores
+            if (suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.textContent = suggestion.text;
+                    li.onclick = function() {
+                        addHashtagToPhoto(suggestion.text);  // Função que adiciona a hashtag à foto
+                        input.value = suggestion.text;  // Preenche o input com a hashtag
+                        suggestionsList.style.display = 'none';  // Esconde a lista de sugestões
+                    };
+                    suggestionsList.appendChild(li);
+                });
+                suggestionsList.style.display = 'block';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        });
+}
+
+// Função para adicionar a hashtag à foto
+function addHashtagToPhoto(hashtagText) {
     const csrfHeaders = getCsrfHeaders();
-    fetch('/photo/editComment', {
+    const photoId = document.getElementById('photo-id').value;  // Certifique-se de ter o id da foto
+    fetch(`/hashtag/add?photoId=${photoId}&hashtagText=${encodeURIComponent(hashtagText)}`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
             ...csrfHeaders
         },
-        body: JSON.stringify({ commentId, commentText, deleteFlag: false })
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.querySelector(`#comment-text-${commentId}`).innerText = commentText;
+        .then(response => {
+            if (response.ok) {
+                console.log('Hashtag adicionada com sucesso!');
             } else {
-                alert("Erro ao editar comentário: " + data.error);
+                console.error('Erro ao adicionar a hashtag');
             }
-        })
-        .catch(error => {
-            console.error("Erro ao editar comentário:", error);
-            alert("Erro ao editar comentário.");
         });
-};
+}
 
-// Função para excluir o comentário
-const deleteComment = (commentId) => {
-    const csrfHeaders = getCsrfHeaders();
-    fetch('/photo/delete/' + commentId, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...csrfHeaders
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById(`comment-${commentId}`).remove();
-            } else {
-                alert("Erro ao excluir comentário: " + data.error);
+// Função para criar uma nova hashtag quando ENTER é pressionado
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('hashtag-input').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const input = event.target;
+            let hashtagText = input.value.trim();
+            if (hashtagText !== '') {
+                addHashtagToPhoto(hashtagText);  // Adiciona a hashtag à foto
+                input.value = '';  // Limpa o campo de input
+                event.preventDefault();  // Impede o envio do formulário
             }
-        })
-        .catch(error => {
-            console.error("Erro ao excluir comentário:", error);
-            alert("Erro ao excluir comentário.");
-        });
-};
+        }
+    });
+});
 
