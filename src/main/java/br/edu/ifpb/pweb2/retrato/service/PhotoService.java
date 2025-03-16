@@ -108,17 +108,25 @@ public class PhotoService {
         return photoRepository.findById(photoId).orElseThrow(() -> new RuntimeException("Foto não encontrada."));
     }
 
-    public void updateComment(Integer commentId, String newText) {
+    public void updateComment(Integer commentId, Integer photographerId, String commentText) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comentário não encontrado."));
 
-        comment.setCommentText(newText);
+        if (!comment.getPhotographer().getId().equals(photographerId)) {
+            throw new RuntimeException("Você não tem permissão para editar este comentário.");
+        }
+
+        comment.setCommentText(commentText);
         commentRepository.save(comment);
     }
 
-    public void deleteComment(Integer commentId) {
+    public void deleteComment(Integer commentId, Integer photographerId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comentário não encontrado."));
+
+        if (!comment.getPhotographer().getId().equals(photographerId)) {
+            throw new RuntimeException("Você não tem permissão para excluir este comentário.");
+        }
 
         commentRepository.delete(comment);
     }
@@ -130,4 +138,6 @@ public class PhotoService {
         // Se o comentário for encontrado, retorna ele, caso contrário, lança uma exceção ou retorna null
         return commentOptional.orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
     }
+
+
 }

@@ -92,7 +92,7 @@ public class PhotographerController {
         // Lista todos os fotógrafos, excluindo o fotógrafo logado
         List<Photographer> photographers = service.list();
         model.addAttribute("photographers", photographers.stream()
-                .filter(p -> !p.getId().equals(photographer.getId()))
+                .filter(p -> !p.getId().equals(photographer.getId()) && !p.isAdmin())
                 .collect(Collectors.toList()));
 
         // Adiciona o fotógrafo logado ao modelo

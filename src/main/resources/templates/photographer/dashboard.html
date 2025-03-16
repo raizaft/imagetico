@@ -13,6 +13,14 @@
 </head>
 <body>
 <div th:insert="~{fragments/header :: headerD}"></div>
+<div class="container mt-3">
+    <div th:if="${mensagemErro}" class="alert alert-danger" role="alert">
+        <span th:text="${mensagemErro}"></span>
+    </div>
+    <div th:if="${mensagem}" class="alert alert-success" role="alert">
+        <span th:text="${mensagem}"></span>
+    </div>
+</div>
 <div class="container-fluid mt-5">
     <div class="row mt-4">
         <div class="col-md-9">
