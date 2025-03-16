@@ -9,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 @Controller
 @RequestMapping("/hashtag")
@@ -36,6 +38,7 @@ public class HashtagController {
 
         // Adiciona a hashtag à foto
         photoService.addHashtag(photo, hashtag);
+        System.out.println("Hashtag adicionada com sucesso! Redirecionando...");
 
         return "redirect:photographer/dashboard";
     }
@@ -63,5 +66,16 @@ public class HashtagController {
         }
 
         return "hashtag/searchResults";
+    }
+
+    @GetMapping("/suggest")
+    @ResponseBody
+    public List<String> suggestHashtags(@RequestParam String query) {
+        List<Hashtag> hashtags = hashtagService.searchHashtags(query);
+        List<String> suggestions = new ArrayList<>();
+        for (Hashtag hashtag : hashtags) {
+            suggestions.add(hashtag.getText());
+        }
+        return suggestions;
     }
 }

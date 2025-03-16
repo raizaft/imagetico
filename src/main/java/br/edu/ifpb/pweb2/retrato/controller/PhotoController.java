@@ -5,7 +5,6 @@ import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -138,6 +135,25 @@ public class PhotoController {
                     "error", e.getMessage()
             ));
         }
+    }
+
+    @GetMapping("/{photoId}/photoView")
+    public ModelAndView photoView(@PathVariable("photoId") Integer photoId,
+                                  RedirectAttributes redirectAttributes) {
+        Photo photo = service.getPhotoById(photoId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
+
+        if (photo == null || photographerLogado == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Foto ou fotógrafo não encontrado.");
+            return new ModelAndView("redirect:/photographer/dashboard");
+        }
+
+        ModelAndView modelAndView = new ModelAndView("/photo/photo-view");
+        modelAndView.addObject("photo", photo);
+        modelAndView.addObject("photographerLogado", photographerLogado);
+        return modelAndView;
     }
 
     @PostMapping("/editComment")

@@ -2,6 +2,7 @@ package br.edu.ifpb.pweb2.retrato.service;
 
 import br.edu.ifpb.pweb2.retrato.model.*;
 import br.edu.ifpb.pweb2.retrato.repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
@@ -81,6 +82,7 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
+    @Transactional
     public void addHashtag(Photo photo, Hashtag hashtag) {
         photo.getHashtags().add(hashtag);
         photoRepository.save(photo);
