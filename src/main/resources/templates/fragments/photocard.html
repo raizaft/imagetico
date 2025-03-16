@@ -52,31 +52,22 @@
                         <p class="comment-name" th:text="${comment.photographer.getName()}" style="margin: 0; font-weight: bold"></p>
                         <p class="comment-text" th:text="${comment.commentText}" style="margin: 0"></p>
                     </div>
+                    <a th:if="${comment.photographer.id == photographerLogado.id}"
+                       th:href="@{/photo/editComment/{id}(id=${comment.id})}"
+                       class="btn btn-light btn-sm">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <!-- Botão de exclusão -->
+                    <a th:if="${comment.photographer.id == photographerLogado.id}"
+                       th:href="@{/photo/delete/{id}(id=${comment.id})}"
+                       class="btn btn-light btn-sm"
+                       onclick="return confirm('Tem certeza que deseja excluir este comentário?');">
+                        <i class="bi bi-trash"></i>
+                    </a>
+
                 </div>
                 <p class="comment-date" th:text="${comment.getFormattedCreatedAt()}" style="font-size: 12px"></p>
             </div>
-<!--            &lt;!&ndash; Ações (Editar e Excluir) &ndash;&gt;-->
-<!--            <div class="comment-actions"-->
-<!--                 th:if="${photographerLogado != null && (photographerLogado.id == comment.photographer.id || photographerLogado.isAdmin)}"-->
-<!--                 style="display: flex; gap: 8px;">-->
-
-<!--                &lt;!&ndash; Ícone Editar &ndash;&gt;-->
-<!--                <form th:action="@{/photo/editComment}" method="post" style="display: inline;">-->
-<!--                    <input type="hidden" name="commentId" th:value="${comment.id}" />-->
-<!--                    <input type="hidden" name="updatedText" id="updatedTextInput" />-->
-<!--                    <button type="button" class="btn btn-light btn-sm" onclick="editComment(this, '${comment.id}')">-->
-<!--                        <i class="bi bi-pencil"></i>-->
-<!--                    </button>-->
-<!--                </form>-->
-
-<!--                &lt;!&ndash; Ícone Excluir &ndash;&gt;-->
-<!--                <form th:action="@{/photo/deleteComment}" method="post" onsubmit="return confirm('Tem certeza que deseja excluir este comentário?');">-->
-<!--                    <input type="hidden" name="commentId" th:value="${comment.id}" />-->
-<!--                    <button type="submit" class="btn btn-light btn-sm">-->
-<!--                        <i class="bi bi-trash"></i>-->
-<!--                    </button>-->
-<!--                </form>-->
-<!--            </div>-->
             <div th:block th:if="${photographerLogado != null and photographerLogado.isAdmin and #lists.size(photo.comments) > 0}">
                 <form th:action="@{/pdf}" method="get">
                     <input type="hidden" name="photo_id" th:value="${photo.id}">
@@ -90,14 +81,4 @@
     </div>
 </div>
 </body>
-<!--<script>-->
-<!--    function editComment(button, commentId) {-->
-<!--        let newText = prompt("Edite seu comentário:");-->
-<!--        if (newText) {-->
-<!--            let form = button.closest("form");-->
-<!--            form.querySelector("#updatedTextInput").value = newText;-->
-<!--            form.submit();-->
-<!--        }-->
-<!--    }-->
-<!--</script>-->
 </html>

@@ -1,12 +1,10 @@
 package br.edu.ifpb.pweb2.retrato.repository;
 
 import br.edu.ifpb.pweb2.retrato.model.Hashtag;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public class HashtagRepository {
-    public Hashtag findByText(String text) {
-        return null;
-    }
+public interface HashtagRepository extends JpaRepository<Hashtag, Integer> {
 
-    public void save(Hashtag hashtag) {
-    }
+    Hashtag findByText(String text);
+
 }

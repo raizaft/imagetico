@@ -20,7 +20,7 @@ public class Hashtag {
     @NotEmpty(message = "O nome da hashtag não pode ser vazio")
     private String text;
 
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "hashtags")
     private Set<Photo> photos = new HashSet<>();
 
     public Hashtag() {

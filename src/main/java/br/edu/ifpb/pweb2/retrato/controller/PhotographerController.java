@@ -6,7 +6,6 @@ import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import br.edu.ifpb.pweb2.retrato.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +27,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -94,7 +92,7 @@ public class PhotographerController {
         // Lista todos os fotógrafos, excluindo o fotógrafo logado
         List<Photographer> photographers = service.list();
         model.addAttribute("photographers", photographers.stream()
-                .filter(p -> !p.getId().equals(photographer.getId()))
+                .filter(p -> !p.getId().equals(photographer.getId()) && !p.isAdmin())
                 .collect(Collectors.toList()));
 
         // Adiciona o fotógrafo logado ao modelo

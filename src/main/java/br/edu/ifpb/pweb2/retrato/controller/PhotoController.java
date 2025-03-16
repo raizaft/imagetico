@@ -1,5 +1,6 @@
 package br.edu.ifpb.pweb2.retrato.controller;
 
+import br.edu.ifpb.pweb2.retrato.model.Comment;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,9 +105,13 @@ public class PhotoController {
             return "redirect:/photographer/dashboard";
         }
 
+        // Verifica se o fotógrafo está suspenso para comentar
+        if (!photographerLogado.isCanComment()) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Você está suspenso e não pode realizar comentários.");
+            return "redirect:/photographer/dashboard";
+        }
         try {
             service.addComment(photographerId, photoId, commentText);
-            redirectAttributes.addFlashAttribute("mensagem", "Comentário adicionado com sucesso!");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
         }
@@ -132,5 +138,78 @@ public class PhotoController {
                     "error", e.getMessage()
             ));
         }
+    }
+
+    @PostMapping("/editComment")
+    public String editComment(@RequestParam("commentId") Integer commentId,
+                              @RequestParam("commentText") String commentText,
+                              @RequestParam("deleteFlag") boolean deleteFlag,
+                              RedirectAttributes redirectAttributes) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
+
+        if (photographerLogado == null || photographerLogado.getId() == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Você precisa estar logado para editar um comentário.");
+            return "redirect:/photographer/dashboard";
+        }
+
+        try {
+            if (deleteFlag) { // Se deleteFlag for true, apaga o comentário
+                service.deleteComment(commentId, photographerLogado.getId());
+                redirectAttributes.addFlashAttribute("mensagem", "Comentário excluído com sucesso!");
+            } else {
+                service.updateComment(commentId, photographerLogado.getId(), commentText);
+                redirectAttributes.addFlashAttribute("mensagem", "Comentário editado com sucesso!");
+            }
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+        }
+
+        return "redirect:/photographer/dashboard";
+    }
+
+    @GetMapping("/editComment/{commentId}")
+    public ModelAndView editCommentForm(@PathVariable Integer commentId, RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
+
+        if (photographerLogado == null || photographerLogado.getId() == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Você precisa estar logado para editar um comentário.");
+            return new ModelAndView("redirect:/photographer/dashboard");
+        }
+
+        Comment comment = service.findCommentById(commentId);
+        if (comment == null || !comment.getPhotographer().getId().equals(photographerLogado.getId())) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Comentário não encontrado ou você não tem permissão para editá-lo.");
+            return new ModelAndView("redirect:/photographer/dashboard");
+        }
+
+        ModelAndView modelAndView = new ModelAndView("photo/editComment");
+        modelAndView.addObject("comment", comment);
+        return modelAndView;
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteComment(@PathVariable("id") Integer commentId, RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
+
+        if (photographerLogado == null || photographerLogado.getId() == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Você precisa estar logado para excluir um comentário.");
+            return "redirect:/photographer/dashboard";
+        }
+
+        try {
+            service.deleteComment(commentId, photographerLogado.getId());
+            redirectAttributes.addFlashAttribute("mensagem", "Comentário excluído com sucesso!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+        }
+
+        return "redirect:/photographer/dashboard";
     }
 }
