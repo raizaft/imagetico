@@ -99,7 +99,6 @@ public class PhotographerController {
 
         // Adiciona o fotógrafo logado ao modelo
         model.addAttribute("photographerLogado", service.findById(photographer.getId()));
-
         return "photographer/dashboard";
     }
 

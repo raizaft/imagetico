@@ -9,7 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -45,6 +47,14 @@ public class Photo {
     public boolean isLikedByUser(Photographer photographer) {
         return likes.stream().anyMatch(like -> like.getPhotographer().equals(photographer));
     }
+
+    @ManyToMany
+    @JoinTable(
+            name = "photo_hashtags",
+            joinColumns = @JoinColumn(name = "photo_id"),
+            inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+    )
+    private Set<Hashtag> hashtags = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
