@@ -119,6 +119,7 @@ public class PhotoService {
         }
 
         comment.setCommentText(commentText);
+        comment.setWasEdited(true);
         commentRepository.save(comment);
     }
 
@@ -140,6 +141,5 @@ public class PhotoService {
         // Se o comentário for encontrado, retorna ele, caso contrário, lança uma exceção ou retorna null
         return commentOptional.orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
     }
-
 
 }

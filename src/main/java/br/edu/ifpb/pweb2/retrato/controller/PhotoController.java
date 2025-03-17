@@ -1,8 +1,10 @@
 package br.edu.ifpb.pweb2.retrato.controller;
 
 import br.edu.ifpb.pweb2.retrato.model.Comment;
+import br.edu.ifpb.pweb2.retrato.model.Hashtag;
 import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.model.Photographer;
+import br.edu.ifpb.pweb2.retrato.service.HashtagService;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import jakarta.validation.Valid;
@@ -23,7 +25,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/photo")
@@ -34,6 +39,9 @@ public class PhotoController {
 
     @Autowired
     private PhotoService service;
+
+    @Autowired
+    private HashtagService hashtagService;
 
     @GetMapping("/form")
     public ModelAndView getForm(RedirectAttributes redirectAttributes) {
@@ -90,7 +98,9 @@ public class PhotoController {
     @PostMapping("/addComment")
     public String addComment(@RequestParam("commentText") String commentText,
                              @RequestParam("photographerId") Integer photographerId,
-                             @RequestParam("photoId") Integer photoId, RedirectAttributes redirectAttributes) {
+                             @RequestParam("photoId") Integer photoId,
+                             @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+                             RedirectAttributes redirectAttributes) {
 
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -112,7 +122,7 @@ public class PhotoController {
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
         }
-        return "redirect:/photographer/dashboard";
+        return "redirect:" + (redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : "/photographer/dashboard");
     }
 
     @PostMapping("/likePhoto")
@@ -153,6 +163,8 @@ public class PhotoController {
         ModelAndView modelAndView = new ModelAndView("/photo/photo-view");
         modelAndView.addObject("photo", photo);
         modelAndView.addObject("photographerLogado", photographerLogado);
+        List<Hashtag> hashtags = hashtagService.getHashtagsByPhotoId(photoId);
+        modelAndView.addObject("hashtags", hashtags);
         return modelAndView;
     }
 
@@ -160,6 +172,7 @@ public class PhotoController {
     public String editComment(@RequestParam("commentId") Integer commentId,
                               @RequestParam("commentText") String commentText,
                               @RequestParam("deleteFlag") boolean deleteFlag,
+                              @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
                               RedirectAttributes redirectAttributes) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -183,11 +196,13 @@ public class PhotoController {
             redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
         }
 
-        return "redirect:/photographer/dashboard";
+        return "redirect:" + (redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : "/photographer/dashboard");
     }
 
     @GetMapping("/editComment/{commentId}")
-    public ModelAndView editCommentForm(@PathVariable Integer commentId, RedirectAttributes redirectAttributes) {
+    public ModelAndView editCommentForm(@PathVariable Integer commentId,
+                                        @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+                                        RedirectAttributes redirectAttributes) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
@@ -205,11 +220,14 @@ public class PhotoController {
 
         ModelAndView modelAndView = new ModelAndView("photo/editComment");
         modelAndView.addObject("comment", comment);
+        modelAndView.addObject("redirectUrl", redirectUrl);
         return modelAndView;
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteComment(@PathVariable("id") Integer commentId, RedirectAttributes redirectAttributes) {
+    public String deleteComment(@PathVariable("id") Integer commentId,
+                                @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+                                RedirectAttributes redirectAttributes) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         Photographer photographerLogado = photographerService.getPhotographerByEmail(email);
@@ -226,6 +244,6 @@ public class PhotoController {
             redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
         }
 
-        return "redirect:/photographer/dashboard";
+        return "redirect:" + (redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : "/photographer/dashboard");
     }
 }

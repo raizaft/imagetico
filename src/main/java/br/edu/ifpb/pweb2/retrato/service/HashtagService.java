@@ -1,6 +1,7 @@
 package br.edu.ifpb.pweb2.retrato.service;
 
 import br.edu.ifpb.pweb2.retrato.model.Hashtag;
+import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.repository.HashtagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,5 +24,9 @@ public class HashtagService {
 
     public List<Hashtag> searchHashtags(String query) {
         return hashtagRepository.findByTextStartingWith(query);
+    }
+
+    public List<Hashtag> getHashtagsByPhotoId(Integer photoId) {
+        return hashtagRepository.findHashtagsByPhotoId(photoId);
     }
 }

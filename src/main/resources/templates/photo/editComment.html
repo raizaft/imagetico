@@ -23,6 +23,7 @@
     <form th:action="@{/photo/editComment}" method="POST" onsubmit="validarFormulario(event)">
         <input type="hidden" name="commentId" th:value="${comment.id}" />
         <input type="hidden" id="deleteFlag" name="deleteFlag" value="false" />
+        <input type="hidden" name="redirectUrl" th:value="${redirectUrl}">
 
         <div class="mb-3">
             <label for="commentText" class="form-label">Novo comentário:</label>
