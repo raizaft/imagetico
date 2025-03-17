@@ -5,11 +5,13 @@ import br.edu.ifpb.pweb2.retrato.model.Photo;
 import br.edu.ifpb.pweb2.retrato.service.HashtagService;
 import br.edu.ifpb.pweb2.retrato.service.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -24,11 +26,10 @@ public class HashtagController {
     private PhotoService photoService;
 
     @PostMapping("/add")
-    public String addHashtag(@RequestParam Integer photoId, @RequestParam String hashtagText) {
-        // Encontra a foto e a hashtag
+    @ResponseBody
+    public ResponseEntity<?> addHashtag(@RequestParam Integer photoId, @RequestParam String hashtagText) {
         Photo photo = photoService.findById(photoId);
         Hashtag hashtag = hashtagService.findByText(hashtagText);
-
 
         if (hashtag == null) {
             hashtag = new Hashtag();
@@ -36,11 +37,10 @@ public class HashtagController {
             hashtagService.save(hashtag);
         }
 
-        // Adiciona a hashtag à foto
         photoService.addHashtag(photo, hashtag);
-        System.out.println("Hashtag adicionada com sucesso! Redirecionando...");
-
-        return "redirect:photographer/dashboard";
+        return ResponseEntity.ok().body(new HashMap<String, Object>() {{
+            put("success", true);
+        }});
     }
 
     @PostMapping("/remove")
@@ -70,12 +70,7 @@ public class HashtagController {
 
     @GetMapping("/suggest")
     @ResponseBody
-    public List<String> suggestHashtags(@RequestParam String query) {
-        List<Hashtag> hashtags = hashtagService.searchHashtags(query);
-        List<String> suggestions = new ArrayList<>();
-        for (Hashtag hashtag : hashtags) {
-            suggestions.add(hashtag.getText());
-        }
-        return suggestions;
+    public List<Hashtag> suggestHashtags(@RequestParam String query) {
+        return hashtagService.searchHashtags(query);
     }
 }

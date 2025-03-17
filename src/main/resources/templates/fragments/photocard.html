@@ -22,27 +22,16 @@
                 flex-direction: column;
                 gap: 16px;">
                 <div class="like-comment" style="display: flex; flex-direction: row; align-items: center; gap: 4px">
-                        <!-- Botão de curtir -->
-                        <button type="button" id="like-btn" class="btn btn-light" style="background: none; padding: 0; border: none" th:onclick="'likePhoto(' + ${photo.getId()} + ',' + ${photographerLogado.getId()} + ')'">
-                            <i class="bi bi-heart"></i>
-                        </button>
+                    <!-- Botão de curtir -->
+                    <button type="button" id="like-btn" class="btn btn-light" style="background: none; padding: 0; border: none" th:onclick="'likePhoto(' + ${photo.getId()} + ',' + ${photographerLogado.getId()} + ')'">
+                        <i class="bi bi-heart"></i>
+                    </button>
                     <p id="likes-count" th:text="${photo.likes.size()}" style="margin: 0"></p>
                     <i class="bi bi-chat" style="margin-left: 8px"></i>
                     <p th:text="${photo.comments.size()}" style="margin: 0"></p>
 
-                    <!-- Hashtag -->
-                    <div class="hashtags-section" style="width: 100%; margin-left: 16px">
-                        <input type="hidden" id="photo-id" th:value="${photo.id}" />
-                        <input type="text" id="hashtag-input" class="form-control" placeholder="Insira uma hashtag..." />
-                        <ul id="hashtag-suggestions" class="list-group" style="display: none;"></ul>
-                    </div>
-                    <!-- Hashtag -->
-
                 </div>
                 <p class="card-text" th:text="${photo.description}"></p>
-                <div class="hashtag-line" th:each="hashtag : ${photo.hashtags}">
-                    <p th:text="${hashtag.text}"></p>
-                </div>
             </div>
             <div class="comment-button">
                 <form th:action="@{/photo/addComment}" method="POST" style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
@@ -91,6 +80,5 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" th:src="@{/js/scripts.js}"></script>
 </body>
 </html>

@@ -39,6 +39,8 @@ public class Comment {
 
     private LocalDateTime createdAt;
 
+    private boolean wasEdited = false;
+
     public Comment(String commentText, Photographer photographer, Photo photo) {
         this.commentText = commentText;
         this.photographer = photographer;

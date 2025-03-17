@@ -46,6 +46,22 @@
                 Postado por <strong th:text="${photo.photographer.name}"></strong> em <span th:text="${photo.getFormattedCreatedAt()}"></span>
             </p>
             <p class="card-text" style="padding-top: 8px" th:text="${photo.description}"></p>
+            <div style="margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px">
+                <!-- Hashtag -->
+                <div th:if="${photo.photographer.id == photographerLogado.id}">
+                    <div class="hashtags-section" style="width: 100%">
+                        <input type="hidden" id="photo-id" th:value="${photo.id}" />
+                        <input type="text" id="hashtag-input" class="form-control" placeholder="Insira uma hashtag..." autocomplete="off" oninput="fetchHashtagsSuggestions()" onkeydown="checkEnterKey(event)" />
+                        <div id="suggestions-container" style="display: none; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; background: white; width: 100%; z-index: 10;"></div>
+                    </div>
+                </div>
+                <!-- Mostrar as hashtags -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <div th:each="hashtag : ${hashtags}" style="display: flex; align-items: center;">
+                        <a href="#" style="color: blue; text-decoration: underline"> <span>#<span th:text="${hashtag.text}"></span></span></a>
+                    </div>
+                </div>
+            </div>
             <div class="card-body" style="display: flex; flex-direction: column; gap: 16px">
                 <div class="desc-like"
                      style="display: flex;
@@ -67,6 +83,7 @@
 
                         <input type="hidden" name="photographerId" th:value="${photographerLogado.getId()}" />
                         <input type="hidden" name="photoId" th:value="${photo.getId()}" />
+                        <input type="hidden" th:value="'/photo/' + ${photoId} + '/photoView'" name="redirectUrl">
 
                         <button type="submit" class="btn btn-light" style="background: none; border: none; padding: 0">
                             <i class="bi bi-plus-circle-fill" style="font-size: 30px"></i>
@@ -84,20 +101,23 @@
                         </div>
                         <div style="min-width: 69px">
                             <a th:if="${comment.photographer.id == photographerLogado.id}"
-                               th:href="@{/photo/editComment/{id}(id=${comment.id})}"
+                               th:href="@{/photo/editComment/{id}(id=${comment.id}, redirectUrl='/photo/' + ${photoId} + '/photoView')}"
                                class="btn btn-light btn-sm">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <!-- Botão de exclusão -->
                             <a th:if="${comment.photographer.id == photographerLogado.id}"
-                               th:href="@{/photo/delete/{id}(id=${comment.id})}"
+                               th:href="@{/photo/delete/{id}(id=${comment.id}, redirectUrl='/photo/' + ${photoId} + '/photoView')}"
                                class="btn btn-light btn-sm"
                                onclick="return confirm('Tem certeza que deseja excluir este comentário?');">
                                 <i class="bi bi-trash"></i>
                             </a>
                         </div>
                     </div>
-                    <div style="width: 100%; display: flex; justify-content: flex-end">
+                    <div style="width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 2px">
+                        <div th:if="${comment.wasEdited == true}">
+                            <p class="comment-date" style="font-size: 12px">Editado - </p>
+                        </div>
                         <p class="comment-date" th:text="${comment.getFormattedCreatedAt()}" style="font-size: 12px"></p>
                     </div>
                 </div>
