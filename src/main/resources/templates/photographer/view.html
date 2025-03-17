@@ -33,7 +33,9 @@
         </div>
         <div class="container-cards">
             <div class="card" th:each="photo : ${photos}">
-                <div th:insert="~{fragments/photocard-profile::photocard-profile(photo=${photo})}"></div>
+                <a th:href="@{/photo/{photoId}/photoView(photoId=${photo.getId()}, photographerId=${photographer.id})}">
+                    <img th:src="${photo.photoPath}" class="card-img-top" alt="Foto">
+                </a>
             </div>
         </div>
     </div>

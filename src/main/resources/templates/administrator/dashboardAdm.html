@@ -64,6 +64,22 @@
                 </tr>
                 </tbody>
             </table>
+            <nav>
+                <ul class="pagination">
+                    <li th:if="${currentPage > 0}" class="page-item">
+                        <a class="page-link" th:href="@{/administrator/dashboardAdm(page=${currentPage - 1}, size=5)}">Anterior</a>
+                    </li>
+
+                    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" class="page-item">
+                        <a class="page-link" th:href="@{/administrator/dashboardAdm(page=${i}, size=5)}" th:text="${i + 1}"></a>
+                    </li>
+
+                    <li th:if="${currentPage + 1 < totalPages}" class="page-item">
+                        <a class="page-link" th:href="@{/administrator/dashboardAdm(page=${currentPage + 1}, size=5)}">Próxima</a>
+                    </li>
+                </ul>
+            </nav>
+
         </div>
     </div>
 </div>
