@@ -4,6 +4,8 @@ import br.edu.ifpb.pweb2.retrato.model.Photographer;
 import br.edu.ifpb.pweb2.retrato.repository.PhotographerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,10 @@ public class PhotographerService {
     @Autowired
     private PhotographerRepository repository;
 
+
+    public Page<Photographer> listPaginatedExcludingAdmin(Integer adminId, Pageable pageable) {
+        return repository.findByIdNot(adminId, pageable);
+    }
     public Photographer register(Photographer photographer) {
         if (repository.existsByEmail(photographer.getEmail())) {
             throw new IllegalArgumentException("Já existe uma conta com esse e-mail.");

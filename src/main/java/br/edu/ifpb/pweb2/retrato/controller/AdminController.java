@@ -5,6 +5,9 @@ import br.edu.ifpb.pweb2.retrato.service.PhotographerService;
 import br.edu.ifpb.pweb2.retrato.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,14 +44,20 @@ public class AdminController {
     }
 
     @GetMapping("/dashboardAdm")
-    public String dashboardAdmin(Model model) {
+    public String dashboardAdmin(   @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "5") int size,
+                                    Model model) {
         Photographer admin = getAuthenticatedPhotographer();
         if (admin == null || admin.getId() == null || !admin.isAdmin()) {
             return "redirect:/photographer/login";
         }
 
-        List<Photographer> photographers = service.list();
-        model.addAttribute("photographers", photographers);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Photographer> photographerPage = service.listPaginatedExcludingAdmin(admin.getId(), pageable);
+
+        model.addAttribute("photographers", photographerPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", photographerPage.getTotalPages());
         model.addAttribute("photographerLogado", admin);
         model.addAttribute("isAdmin", admin.isAdmin());
         return "administrator/dashboardAdm";
