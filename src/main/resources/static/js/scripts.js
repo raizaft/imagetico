@@ -51,10 +51,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.length > 0) {
                     suggestionsContainer.style.display = 'block';
                     data.forEach(hashtag => {
+                        let hashtagText = hashtag.text.replace(/^#/, ""); // Remove # se já existir
                         let suggestionItem = document.createElement("div");
-                        suggestionItem.innerText = "#" + hashtag.text;
+                        suggestionItem.innerText = "#" + hashtagText;
                         suggestionItem.classList.add("suggestion-item");
-                        suggestionItem.onclick = () => addHashtagToPhoto(hashtag.text);
+
+                        // Preenche o input com a hashtag clicada e esconde a lista de sugestões
+                        suggestionItem.onclick = () => {
+                            document.getElementById("hashtag-input").value = "#" + hashtag.text;
+                            suggestionsContainer.style.display = 'none';
+                        };
+
                         suggestionsContainer.appendChild(suggestionItem);
                     });
                 } else {
@@ -69,8 +76,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Função para adicionar a hashtag à foto
     const addHashtagToPhoto = (hashtagText) => {
         const photoId = document.getElementById("photo-id").value;
+        let cleanHashtagText = hashtagText.replace(/^#/, ""); // Remove # caso tenha sido digitado manualmente
 
-        fetch(`/hashtag/add?photoId=${photoId}&hashtagText=${hashtagText}`, {
+        fetch(`/hashtag/add?photoId=${photoId}&hashtagText=${cleanHashtagText}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -84,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Agora, vamos adicionar a hashtag diretamente na lista de hashtags
                     let newHashtagDiv = document.createElement("div");
-                    newHashtagDiv.innerHTML = `<span>#${hashtagText}</span>`;
+                    newHashtagDiv.innerHTML = `<span>#${cleanHashtagText}</span>`;
                     document.getElementById("hashtag-list").appendChild(newHashtagDiv);
                 } else {
                     alert("Erro ao adicionar hashtag.");
