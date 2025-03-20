@@ -213,7 +213,8 @@ public class PhotographerController {
     }
 
     @PostMapping("/register")
-    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, @RequestParam("password") String password, BindingResult result, RedirectAttributes redirectAttributes) throws IOException {
+    public String registerPhotographer(@ModelAttribute @Valid Photographer photographer, BindingResult result,
+                                       @RequestParam("password") String password, RedirectAttributes redirectAttributes) throws IOException {
         if (result.hasErrors()) {
             return "photographer/form";
         }

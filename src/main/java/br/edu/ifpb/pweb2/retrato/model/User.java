@@ -1,6 +1,7 @@
 package br.edu.ifpb.pweb2.retrato.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
